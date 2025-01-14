@@ -3,7 +3,7 @@ name: Release Management
 on:
   push:
     branches:
-      - 'main' # or your default branch
+      - 'prod'
     paths:
       - 'package.json'
 
@@ -35,5 +35,3 @@ jobs:
           name: Release v${{ steps.package-version.outputs.version }}
           generateReleaseNotes: true
           makeLatest: true
-          artifacts: 'release.tar.gz,foo/*.txt' # adjust these as needed
-          token: ${{ secrets.GITHUB_TOKEN }}

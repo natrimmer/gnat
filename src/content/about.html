@@ -1,0 +1,108 @@
+<!-- extends: base -->
+<!-- title: /about/ -->
+
+<div>
+  <div class="flex justify-between w-full items-end mb-4">
+    <h3
+      class="text-3xl font-semibold underline decoration-8 decoration-mondrian_yellow"
+    >
+      About
+    </h3>
+    <span class="h-max">
+      <p class="text-xs font-mono text-gray-500">me, myself, and this site</p>
+    </span>
+  </div>
+  <div>
+    <div>
+      <p class="text-gray-700 leading-relaxed">
+        I'm a Products and Services Associate at the
+        <a href="https://www.mcgovern.org/">Patrick J. McGovern Foundation</a>.
+        Most of my time is working on infrastructure with some fullstack work as
+        well.
+      </p>
+      <p class="text-gray-700 leading-relaxed">
+        I have a B.S. in Computer Science from North Seattle College.
+      </p>
+      <p class="text-gray-700 leading-relaxed">
+        Aside from technology I like reading, cycling.
+      </p>
+    </div>
+    <div>
+      <h3 class="text-lg font-semibold text-gray-900">Why a Custom SSG?</h3>
+      <p class="text-gray-700 leading-relaxed">
+        While there are many great static site generators available, I built a
+        custom solution that emphasizes composability and HTML-first
+        development:
+      </p>
+      <ul class="list-disc pl-6">
+        <li>
+          <strong class="font-semibold text-gray-900"
+            >Component Architecture:</strong
+          >
+          Content is built from reusable HTML components that can be nested and
+          composed. Each component is a standalone HTML file, making them easy
+          to maintain and reuse.
+        </li>
+        <li>
+          <strong class="font-semibold text-gray-900"
+            >HTML-First Design:</strong
+          >
+          Uses HTML comment-based directives to extend HTML instead of
+          introducing new syntax or templating languages. Content remains valid
+          HTML throughout the build process.
+        </li>
+        <li>
+          <strong class="font-semibold text-gray-900">Smart Routing:</strong>
+          Automatically transforms single HTML files into clean URLs
+          (/about.html → /about/) while maintaining a logical file structure.
+        </li>
+        <li>
+          <strong class="font-semibold text-gray-900">Feed System:</strong>
+          Integrated component-based feed generation with automatic pagination
+          and post creation.
+        </li>
+      </ul>
+      <p class="text-gray-700 leading-relaxed mt-2">
+        The result is a lightweight (~500 lines) TypeScript solution that turns
+        simple HTML components into a full-featured site while maintaining
+        debuggability and performance.
+      </p>
+    </div>
+    <div>
+      <h3>Design Inspirations</h3>
+      <div class="flex flex-wrap gap-4">
+        <a href="https://usgraphics.com" class="font-mono no-underline">
+          <div
+            class="size-48 bg-mondrian_white shadow-mondrian_inverse_xl flex items-center justify-center text-center p-8"
+          >
+            <p>U.S. Graphics</p>
+          </div>
+        </a>
+        <a href="" class="font-sans no-underline">
+          <div
+            class="size-48 bg-mondrian_white shadow-mondrian_inverse_xl flex items-center justify-center text-center p-8"
+          >
+            <p class="text-3xl">Piet Mondrian</p>
+          </div>
+        </a>
+        <a
+          href="https://www.brailleinstitute.org/"
+          class="font-sans no-underline"
+        >
+          <div
+            class="size-48 bg-mondrian_white shadow-mondrian_inverse_xl flex items-center justify-center text-center p-8"
+          >
+            <p class="text-5xl">Braille Institute</p>
+          </div>
+        </a>
+        <a href="https://www.mcmaster.com/" class="font-mono no-underline">
+          <div
+            class="size-48 bg-mondrian_white shadow-mondrian_inverse_xl flex items-center justify-center text-center p-8"
+          >
+            <p class="text-3xl">McMaster-Carr</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

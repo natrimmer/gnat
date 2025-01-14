@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><!-- TITLE --></title>
+
+    <!-- Favicons -->
+    <link rel="icon" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta
+      name="theme-color"
+      content="#ffffff"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#000000"
+      media="(prefers-color-scheme: dark)"
+    />
+
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+
+  <body>
+    <!-- Reduce margin on mobile, restore on lg -->
+    <div class="relative m-4 lg:m-20 border border-black shadow-mondrian_xl">
+      <!-- Hide decorative elements on mobile -->
+      <div
+        class="hidden lg:block absolute top-0 left-0 w-full h-full pointer-events-none -z-10"
+      >
+        <div
+          class="absolute w-48 h-32 bg-mondrian_blue shadow-mondrian"
+          style="top: -10%; left: -2%"
+        ></div>
+        <div
+          class="absolute w-64 h-96 bg-mondrian_red shadow-mondrian_inverse"
+          style="bottom: -20%; right: -10%"
+        ></div>
+        <div
+          class="absolute w-1/2 h-24 bg-mondrian_yellow shadow-mondrian"
+          style="bottom: -5%; right: 33%"
+        ></div>
+      </div>
+
+      <div class="bg-white">
+        <!-- Header section -->
+        <div>
+          <!-- Remove fixed margin, make responsive -->
+          <div
+            class="p-4 lg:pl-4 lg:pb-4 lg:ml-56 border-l border-dashed border-l-black"
+          >
+            <div class="flex justify-between w-full pt-4 lg:pt-10">
+              <!-- INCLUDE:header -->
+              <!-- INCLUDE:version -->
+            </div>
+          </div>
+          <hr class="border-black mb-1" />
+          <hr class="border-black" />
+        </div>
+
+        <!-- Main content area - stack on mobile, side-by-side on lg -->
+        <div class="flex flex-col lg:flex-row h-max">
+          <!-- Nav container - full width on mobile -->
+          <div class="w-full lg:w-56 p-4">
+            <!-- INCLUDE:navigation -->
+          </div>
+
+          <!-- Content area -->
+          <div
+            class="p-4 border-t lg:border-t-0 lg:border-l border-dashed border-black flex-1"
+          >
+            <!-- CONTENT -->
+            <div class="pt-4">
+              <!-- INCLUDE:footer -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

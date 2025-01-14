@@ -1,0 +1,93 @@
+{
+	"tracking": "Lifting",
+	"year": 2025,
+	"days": {
+		"1-16": {
+			"Bench Press": {
+				"Set 1": {
+					"Weight (lbs)": 120,
+					"Reps": 6
+				},
+				"Set 2": {
+					"Weight (lbs)": 120,
+					"Reps": 5
+				},
+				"Set 3": {
+					"Weight (lbs)": 115,
+					"Reps": 7
+				}
+			},
+			"Pull-Ups": {
+				"Set 1": {
+					"Reps": 8
+				},
+				"Set 2": {
+					"Reps": 6
+				},
+				"Set 3": {
+					"Reps": 5
+				}
+			}
+		},
+		"1-18": {
+			"Deadlift": {
+				"Set 1": {
+					"Weight (lbs)": 200,
+					"Reps": 5
+				},
+				"Set 2": {
+					"Weight (lbs)": 210,
+					"Reps": 5
+				},
+				"Set 3": {
+					"Weight (lbs)": 220,
+					"Reps": 3
+				}
+			},
+			"Overhead Press": {
+				"Set 1": {
+					"Weight (lbs)": 80,
+					"Reps": 8
+				},
+				"Set 2": {
+					"Weight (lbs)": 85,
+					"Reps": 6
+				},
+				"Set 3": {
+					"Weight (lbs)": 85,
+					"Reps": 5
+				}
+			}
+		},
+		"1-19": {
+			"Squats": {
+				"Set 1": {
+					"Weight (lbs)": 180,
+					"Reps": 5
+				},
+				"Set 2": {
+					"Weight (lbs)": 185,
+					"Reps": 4
+				},
+				"Set 3": {
+					"Weight (lbs)": 185,
+					"Reps": 3
+				}
+			},
+			"Lat Pulldown": {
+				"Set 1": {
+					"Weight (lbs)": 100,
+					"Reps": 10
+				},
+				"Set 2": {
+					"Weight (lbs)": 100,
+					"Reps": 8
+				},
+				"Set 3": {
+					"Weight (lbs)": 95,
+					"Reps": 10
+				}
+			}
+		}
+	}
+}

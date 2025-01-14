@@ -1,0 +1,92 @@
+<!-- extends: base -->
+<!-- title: /articles/archive/ -->
+
+<div class="w-full">
+  <div class="flex justify-between w-full items-end mb-4">
+    <h3
+      class="text-3xl font-semibold underline decoration-8 decoration-mondrian_blue"
+    >
+      Archive
+    </h3>
+    <span class="h-max">
+      <p class="text-xs font-mono text-gray-500">
+        archived, potentially embarrassing content from before 2025 🙈
+      </p>
+    </span>
+  </div>
+  <div class="mb-4">
+    <a
+      href="/articles/"
+      class="w-full text-xs p-1 text-black border border-black shadow-mondrian font-mono transition-colors bg-white hover:bg-mondrian_yellow hover:text-white text-center inline-block focus:outline focus:outline-offset-2 focus:outline-mondrian_blue"
+      aria-label="Back to Articles"
+    >
+      ← BACK
+    </a>
+  </div>
+  <table
+    class="w-full border-collapse border border-mondrian_white"
+    aria-describedby="table-note"
+  >
+    <caption class="sr-only">
+      List of curated websites and their descriptions
+    </caption>
+    <thead>
+      <tr class="border-b border-b-black bg-mondrian_white text-left font-sans">
+        <th class="w-1/6 pl-1" scope="col">Title</th>
+        <th scope="col">Description</th>
+        <th class="w-1/12 pl-1" scope="col">Link</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-b-gray-300 hover:bg-gray-100">
+        <td class="text-left font-mono text-xs align-top pt-1 pl-1" scope="row">
+          Archived 1
+        </td>
+        <td class="text-sm align-top py-1">
+          An archived article from the past.
+        </td>
+        <td class="align-top p-1">
+          <a
+            href="/articles/archive/0001/"
+            class="w-full text-xs py-1 px-1 text-black border border-black shadow-mondrian font-mono transition-colors bg-white hover:bg-mondrian_blue hover:text-white text-center inline-block focus:outline focus:outline-offset-2 focus:outline-mondrian_blue"
+            aria-label="Archive 1"
+          >
+            LINK →
+          </a>
+        </td>
+      </tr>
+      <tr class="border-b border-b-gray-300 hover:bg-gray-100">
+        <td class="text-left font-mono text-xs align-top pt-1 pl-1" scope="row">
+          Archived 2
+        </td>
+        <td class="text-sm align-top py-1">
+          Another archived article from the past.
+        </td>
+        <td class="align-top p-1">
+          <a
+            href="/articles/archive/0002/"
+            class="w-full text-xs py-1 px-1 text-black border border-black shadow-mondrian font-mono transition-colors bg-white hover:bg-mondrian_blue hover:text-white text-center inline-block focus:outline focus:outline-offset-2 focus:outline-mondrian_blue"
+            aria-label="Archive 2"
+          >
+            LINK →
+          </a>
+        </td>
+      </tr>
+    </tbody>
+    <tfoot id="table-note">
+      <tr>
+        <th colspan="3" class="text-xs text-gray-500 p-1 text-left">Notes:</th>
+      </tr>
+      <tr>
+        <td colspan="3" class="text-xs text-gray-500 p-1">
+          This is a note about the archive.
+        </td>
+      </tr>
+      <tr>
+        <td colspan="3" class="text-xs text-gray-500 p-1">
+          This is another note about the archive.
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+</div>

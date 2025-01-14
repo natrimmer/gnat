@@ -1,0 +1,81 @@
+<!-- extends: base -->
+<!-- title: Archive 2 -->
+
+<style>
+  .scene {
+    width: 200px;
+    height: 200px;
+    margin: 100px auto;
+    perspective: 600px;
+  }
+
+  .cube {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: rotate 10s infinite linear;
+  }
+
+  .cube__face {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-family: sans-serif;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .cube__face--front {
+    background: rgba(90, 90, 255, 0.7);
+    transform: rotateY(0deg) translateZ(100px);
+  }
+  .cube__face--right {
+    background: rgba(255, 90, 90, 0.7);
+    transform: rotateY(90deg) translateZ(100px);
+  }
+  .cube__face--back {
+    background: rgba(90, 255, 90, 0.7);
+    transform: rotateY(180deg) translateZ(100px);
+  }
+  .cube__face--left {
+    background: rgba(255, 255, 90, 0.7);
+    transform: rotateY(-90deg) translateZ(100px);
+  }
+  .cube__face--top {
+    background: rgba(255, 90, 255, 0.7);
+    transform: rotateX(90deg) translateZ(100px);
+  }
+  .cube__face--bottom {
+    background: rgba(90, 255, 255, 0.7);
+    transform: rotateX(-90deg) translateZ(100px);
+  }
+
+  @keyframes rotate {
+    from {
+      transform: rotateX(-20deg) rotateY(0);
+    }
+    to {
+      transform: rotateX(-20deg) rotateY(360deg);
+    }
+  }
+
+  /* Hover effect to pause animation */
+  .cube:hover {
+    animation-play-state: paused;
+  }
+</style>
+<div class="scene">
+  <div class="cube">
+    <div class="cube__face cube__face--front">Front</div>
+    <div class="cube__face cube__face--back">Back</div>
+    <div class="cube__face cube__face--right">Right</div>
+    <div class="cube__face cube__face--left">Left</div>
+    <div class="cube__face cube__face--top">Top</div>
+    <div class="cube__face cube__face--bottom">Bottom</div>
+  </div>
+</div>

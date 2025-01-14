@@ -1,0 +1,39 @@
+name: Release Management
+
+on:
+  push:
+    branches:
+      - 'main' # or your default branch
+    paths:
+      - 'package.json'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get version from package.json
+        id: package-version
+        run: |
+          VERSION=$(grep '"version":' package.json | cut -d'"' -f4)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create Git Tag
+        run: |
+          git tag v${{ steps.package-version.outputs.version }}
+          git push origin v${{ steps.package-version.outputs.version }}
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ steps.package-version.outputs.version }}
+          name: Release v${{ steps.package-version.outputs.version }}
+          generateReleaseNotes: true
+          makeLatest: true
+          artifacts: 'release.tar.gz,foo/*.txt' # adjust these as needed
+          token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,21 +1,97 @@
 <!-- extends: base -->
 <!-- title: init -->
 <!-- date: 2025-01-10  -->
-<!-- updated: 2025-01-11 -->
+<!-- updated: 2025-01-16 -->
 
-<p>
-  This is first article using this new build system that I developed
-  specifically for this site. I suspect this article should be initiated using:
-</p>
-<pre>run init</pre>
-<p>
-  Tongue in cheek aside, it has been fun and exciting developing this new site
-  and build system. I've tried and dabbled with countless static site
-  generators, but none of them have been quite right. I wanted something that
-  had the development convience and extensibility of a modern framework yet
-  produced something performant, simple, js free, and easy to maintain. I wanted
-  a static site with as close to dynamic content as possible. Hence a build
-  system that runs often on git pushes. The result <em>should be</em> a site
-  that is easy to update and performs well on all devices. We'll see how it
-  feels in the long run.
-</p>
+<div>
+  <pre class="text-xs">
+    ┌──────────────┐        ┌──────────────┐         ┌─────────────┐
+    │ Source Files │───┐    │              │░   ┌───▶│ Assets Copy │░
+    └──────────────┘░  └───▶│ File Scanner │────┘    └─────────────┘░
+     ░░░░░░░░░░░░░░░░       │              │░  .other ░░░░░░░░░░░░░░░
+                            └──────────────┘░
+    ┌──────────────┐         ░░░░░░░│░░░░░░░░       ┌──────────────┐
+    │  Components  │──┐             │               │ File Watcher │░
+    └──────────────┘░ │             │ .html         └──────────────┘░
+     ░░░░░░░░░░░░░░░░ │             │                ░░░░░░░│░░░░░░░░
+                      │             │                       │
+                      │             │                       ▼
+    ┌─────────────────┼─────────────▼──────────────────────────────┐
+    │Build Pipeline   │   ┌───────────────────┐                    │░
+    │                 └──▶│ Content Processor │░                   │░
+    │                     └───────────────────┘░                   │░
+    │                      ░░░░░░░░░│░░░░░░░░░░░                   │░
+    │                               ▼                              │░
+    │                     ┌───────────────────┐                    │░
+    │                     │ Extract Metadata  │░                   │░
+    │                     └───────────────────┘░                   │░
+    │                      ░░░░░░░░░│░░░░░░░░░░░                   │░
+    │                               ▼                              │░
+    │                     ┌───────────────────┐                    │░
+    │                     │  Apply Template   │░                   │░
+    │                     └───────────────────┘░                   │░
+    │                      ░░░░░░░░░│░░░░░░░░░░░                   │░
+    │                               ▼                              │░
+    │                     ┌───────────────────┐                    │░
+    │                     │  Process Nested   │░                   │░
+    │                     │    Components     │░                   │░
+    │                     └───────────────────┘░                   │░
+    │                      ░░░░░░░░░│░░░░░░░░░░░                   │░
+    │                               ▼                              │░
+    │                     ┌───────────────────┐                    │░
+    │                     │  Generate Pages   │░                   │░
+    │                     └───────────────────┘░                   │░
+    │                      ░░░░░░░░░░░░░░░░░░░░░                   │░
+    └──────────────────────────────────────────────────────────────┘░
+     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+                                    ▼
+    ┌──────────────────────────────────────────────────────────────┐
+    │                         Static Site                          │░
+    └──────────────────────────────────────────────────────────────┘░
+     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+                                    ▼
+    ┌──────────────────────────────────────────────────────────────┐
+    │                         Live Server                          │░
+    └──────────────────────────────────────────────────────────────┘░
+     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+  </pre>
+  <p>
+    It has been fun and exciting developing this new site and build system. I've
+    tried and dabbled with countless static site generators, but none of them
+    have been quite right. I wanted something that had the development
+    convenience and extensibility of a modern framework yet produced something
+    performant, simple, js free, and easy to maintain.
+  </p>
+  <div class="bg-gray-100 p-2 mt-4">
+    <h4 class="text-2xl font-sans font-semibold">How It Works</h4>
+  </div>
+  <p>
+    The build system operates on a component-based architecture with a few key
+    principles:
+  </p>
+  <dl class="font-mono text-sm space-y-2 mt-4">
+    <dt class="font-semibold">Content Files:</dt>
+    <dd>
+      HTML files with metadata in comments. Each file represents a page or
+      entry.
+    </dd>
+    <dt class="font-semibold">Components:</dt>
+    <dd>
+      Reusable HTML snippets (templates, rows, footers) that get injected during
+      build.
+    </dd>
+    <dt class="font-semibold">Build Process:</dt>
+    <dd>
+      Scans content directories, processes files based on type (articles, notes,
+      feed), generates paginated indexes.
+    </dd>
+    <dt class="font-semibold">Development Mode:</dt>
+    <dd>Live server + file watcher for instant rebuilds during development.</dd>
+  </dl>
+  <p class="mt-4">
+    All content processing happens at build time. The result is a purely static
+    site with no client-side JavaScript, yet it maintains dynamic features
+    through automated rebuilds on git pushes. Navigation uses standard HTML
+    pagination, and components allow for consistent styling across pages.
+  </p>
+</div>

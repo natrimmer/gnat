@@ -1,10 +1,8 @@
-import { exec } from 'child_process';
 import fs from 'fs/promises';
-import { minify } from 'html-minifier';
 import path from 'path';
 import { BuildOptions } from 'src/utils/types';
-import { promisify } from 'util';
 import { getLogger } from '../utils/logger';
+import { generateTree } from '../utils/tree';
 
 interface PageData {
   content: string;
@@ -24,19 +22,11 @@ type ActivityData = {
   [key: string]: number | string | ActivityData;
 };
 
-const execAsync = promisify(exec);
+const COLOR_OPTIONS = ['mondrian_yellow', 'mondrian_red', 'mondrian_blue'];
 
-const minifyOptions = {
-  collapseWhitespace: true,
-  removeComments: true,
-  removeEmptyAttributes: true,
-  removeRedundantAttributes: true,
-  removeScriptTypeAttributes: true,
-  removeStyleLinkTypeAttributes: true,
-  useShortDoctype: true,
-  minifyCSS: true,
-  minifyJS: true,
-};
+function getColorOption(): string {
+  return COLOR_OPTIONS[Math.floor(Math.random() * COLOR_OPTIONS.length)];
+}
 
 async function getAllTrackingData(): Promise<TrackingData[]> {
   try {
@@ -321,10 +311,7 @@ async function buildPage(
             await fs.mkdir(path.dirname(individualPagePath), {
               recursive: true,
             });
-            await fs.writeFile(
-              individualPagePath,
-              minify(individualPageContent, minifyOptions),
-            );
+            await fs.writeFile(individualPagePath, individualPageContent);
 
             // Return feed table row for the main feed page listing
             return feedTableRowTemplate
@@ -343,11 +330,11 @@ async function buildPage(
           componentsDir,
         );
         const feedTableNextLinkTemplate = await findComponent(
-          'feed-table-next-link',
+          'table-next-link',
           componentsDir,
         );
         const feedTablePrevLinkTemplate = await findComponent(
-          'feed-table-prev-link',
+          'table-prev-link',
           componentsDir,
         );
 
@@ -381,14 +368,18 @@ async function buildPage(
           if (prevPagePath) {
             footer = footer.replace(
               '<!-- FEED_TABLE_PREV_LINK -->',
-              feedTablePrevLinkTemplate.replace('<!-- PATH -->', prevPagePath),
+              feedTablePrevLinkTemplate
+                .replace('<!-- PATH -->', prevPagePath)
+                .replace('<!-- COLOR -->', getColorOption()),
             );
           }
 
           if (nextPagePath) {
             footer = footer.replace(
               '<!-- FEED_TABLE_NEXT_LINK -->',
-              feedTableNextLinkTemplate.replace('<!-- PATH -->', nextPagePath),
+              feedTableNextLinkTemplate
+                .replace('<!-- PATH -->', nextPagePath)
+                .replace('<!-- COLOR -->', getColorOption()),
             );
           }
 
@@ -416,10 +407,7 @@ async function buildPage(
 
           // Ensure directory exists and write the file
           await fs.mkdir(path.dirname(pageOutputPath), { recursive: true });
-          await fs.writeFile(
-            pageOutputPath,
-            minify(pageContent, minifyOptions),
-          );
+          await fs.writeFile(pageOutputPath, pageContent);
         }
         break;
       }
@@ -504,10 +492,7 @@ async function buildPage(
             await fs.mkdir(path.dirname(individualPagePath), {
               recursive: true,
             });
-            await fs.writeFile(
-              individualPagePath,
-              minify(individualPageContent, minifyOptions),
-            );
+            await fs.writeFile(individualPagePath, individualPageContent);
 
             // Return note table row for the main note page listing
             return articleTableRowTemplate
@@ -526,11 +511,11 @@ async function buildPage(
           componentsDir,
         );
         const articleTableNextLinkTemplate = await findComponent(
-          'article-table-next-link',
+          'table-next-link',
           componentsDir,
         );
         const articleTablePrevLinkTemplate = await findComponent(
-          'article-table-prev-link',
+          'table-prev-link',
           componentsDir,
         );
 
@@ -563,20 +548,18 @@ async function buildPage(
           if (prevPagePath) {
             footer = footer.replace(
               '<!-- ARTICLE_TABLE_PREV_LINK -->',
-              articleTablePrevLinkTemplate.replace(
-                '<!-- PATH -->',
-                prevPagePath,
-              ),
+              articleTablePrevLinkTemplate
+                .replace('<!-- PATH -->', prevPagePath)
+                .replace('<!-- COLOR -->', getColorOption()),
             );
           }
 
           if (nextPagePath) {
             footer = footer.replace(
               '<!-- ARTICLE_TABLE_NEXT_LINK -->',
-              articleTableNextLinkTemplate.replace(
-                '<!-- PATH -->',
-                nextPagePath,
-              ),
+              articleTableNextLinkTemplate
+                .replace('<!-- PATH -->', nextPagePath)
+                .replace('<!-- COLOR -->', getColorOption()),
             );
           }
 
@@ -607,10 +590,7 @@ async function buildPage(
 
           // Ensure directory exists and write the file
           await fs.mkdir(path.dirname(pageOutputPath), { recursive: true });
-          await fs.writeFile(
-            pageOutputPath,
-            minify(pageContent, minifyOptions),
-          );
+          await fs.writeFile(pageOutputPath, pageContent);
         }
         break;
       }
@@ -642,7 +622,7 @@ async function buildPage(
           })
           .sort((a, b) => b.localeCompare(a)); // Sort in reverse order (newest first)
 
-        // Process each feed item
+        // Process each article item
         const articles = await Promise.all(
           articleFiles.map(async (article) => {
             const articleContent = await fs.readFile(
@@ -695,10 +675,7 @@ async function buildPage(
             await fs.mkdir(path.dirname(individualPagePath), {
               recursive: true,
             });
-            await fs.writeFile(
-              individualPagePath,
-              minify(individualPageContent, minifyOptions),
-            );
+            await fs.writeFile(individualPagePath, individualPageContent);
 
             // Return feed table row for the main feed page listing
             return articleTableRowTemplate
@@ -717,11 +694,11 @@ async function buildPage(
           componentsDir,
         );
         const articleTableNextLinkTemplate = await findComponent(
-          'article-table-next-link',
+          'table-next-link',
           componentsDir,
         );
         const articleTablePrevLinkTemplate = await findComponent(
-          'article-table-prev-link',
+          'table-prev-link',
           componentsDir,
         );
 
@@ -756,20 +733,18 @@ async function buildPage(
           if (prevPagePath) {
             footer = footer.replace(
               '<!-- ARTICLE_TABLE_PREV_LINK -->',
-              articleTablePrevLinkTemplate.replace(
-                '<!-- PATH -->',
-                prevPagePath,
-              ),
+              articleTablePrevLinkTemplate
+                .replace('<!-- PATH -->', prevPagePath)
+                .replace('<!-- COLOR -->', getColorOption()),
             );
           }
 
           if (nextPagePath) {
             footer = footer.replace(
               '<!-- ARTICLE_TABLE_NEXT_LINK -->',
-              articleTableNextLinkTemplate.replace(
-                '<!-- PATH -->',
-                nextPagePath,
-              ),
+              articleTableNextLinkTemplate
+                .replace('<!-- PATH -->', nextPagePath)
+                .replace('<!-- COLOR -->', getColorOption()),
             );
           }
 
@@ -800,10 +775,7 @@ async function buildPage(
 
           // Ensure directory exists and write the file
           await fs.mkdir(path.dirname(pageOutputPath), { recursive: true });
-          await fs.writeFile(
-            pageOutputPath,
-            minify(pageContent, minifyOptions),
-          );
+          await fs.writeFile(pageOutputPath, pageContent);
         }
         break;
       }
@@ -824,8 +796,164 @@ async function buildPage(
         }
         await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
-        const minifiedContent = minify(finalContent, minifyOptions);
-        await fs.writeFile(outputPath, minifiedContent);
+        await fs.writeFile(outputPath, finalContent);
+        break;
+      }
+      case 'changelog.html': {
+        const changelogTableRowTemplate = await findComponent(
+          'changelog-table-row',
+          componentsDir,
+        );
+        const changelogTableTemplate = await findComponent(
+          'changelog-table',
+          componentsDir,
+        );
+
+        const outputPath = path.join(outDir, 'changelog', 'index.html');
+        await fs.mkdir(path.dirname(outputPath), { recursive: true });
+
+        // Get all changelog content files
+        const changelogDir = path.join(srcDir, 'content', 'changelog');
+        const changelogFiles = (await fs.readdir(changelogDir))
+          .filter((file) => {
+            return (
+              file.endsWith('.html') &&
+              (options.includeDrafts || !file.startsWith('draft_'))
+            );
+          })
+          .sort((a, b) => b.localeCompare(a)); // Sort in reverse order (newest first)
+
+        // Process each changelog entry
+        const entries = await Promise.all(
+          changelogFiles.map(async (file) => {
+            const changelogContent = await fs.readFile(
+              path.join(changelogDir, file),
+              'utf-8',
+            );
+
+            const changelogItemData = await parseMetadata(changelogContent);
+            const version = changelogItemData.version || '';
+            const date = changelogItemData.date || '';
+            const content = changelogItemData.content || '';
+            let link = changelogItemData.link || '';
+
+            let rowContent = changelogTableRowTemplate;
+
+            // First replace version, date, and changes
+            rowContent = rowContent
+              .replace('<!-- VERSION -->', version)
+              .replace('<!-- DATE -->', date)
+              .replace('<!-- CHANGES -->', content);
+
+            // Then handle the link if it exists
+            if (link && link !== '') {
+              const changelogTableLinkTemplate = await findComponent(
+                'changelog-table-link',
+                componentsDir,
+              );
+              const linkHtml = changelogTableLinkTemplate
+                .replace('<!-- LINK -->', link)
+                .replace('<!-- VERSION -->', version)
+                .replace('<!-- COLOR -->', getColorOption());
+              rowContent = rowContent.replace('<!-- LINK -->', linkHtml);
+            }
+
+            return rowContent;
+          }),
+        );
+
+        // Pagination setup
+        const ITEMS_PER_PAGE = 20;
+        const totalPages = Math.ceil(entries.length / ITEMS_PER_PAGE);
+
+        const changelogTableFooterTemplate = await findComponent(
+          'changelog-table-footer',
+          componentsDir,
+        );
+        const changelogTableNextLinkTemplate = await findComponent(
+          'table-next-link',
+          componentsDir,
+        );
+        const changelogTablePrevLinkTemplate = await findComponent(
+          'table-prev-link',
+          componentsDir,
+        );
+
+        // Generate each page
+        for (let currentPage = 1; currentPage <= totalPages; currentPage++) {
+          const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+          const endIndex = startIndex + ITEMS_PER_PAGE;
+          const paginatedItems = entries.slice(startIndex, endIndex);
+
+          let changelogTable = changelogTableTemplate.replace(
+            '<!-- ROWS -->',
+            paginatedItems.join('\n'),
+          );
+
+          // Add footer with pagination
+          let footer = changelogTableFooterTemplate
+            .replace('<!-- CURRENT_PAGE -->', currentPage.toString())
+            .replace('<!-- TOTAL_PAGES -->', totalPages.toString());
+
+          // Add navigation links
+          const prevPagePath =
+            currentPage > 1
+              ? currentPage === 2
+                ? '/changelog/'
+                : `/changelog/page/${currentPage - 1}/`
+              : '';
+          const nextPagePath =
+            currentPage < totalPages
+              ? `/changelog/page/${currentPage + 1}/`
+              : '';
+
+          if (prevPagePath) {
+            footer = footer.replace(
+              '<!-- PREV_LINK -->',
+              changelogTablePrevLinkTemplate
+                .replace('<!-- PATH -->', prevPagePath)
+                .replace('<!-- COLOR -->', getColorOption()),
+            );
+          }
+
+          if (nextPagePath) {
+            footer = footer.replace(
+              '<!-- NEXT_LINK -->',
+              changelogTableNextLinkTemplate
+                .replace('<!-- PATH -->', nextPagePath)
+                .replace('<!-- COLOR -->', getColorOption()),
+            );
+          }
+
+          changelogTable = changelogTable.replace('<!-- FOOTER -->', footer);
+
+          // Create the full page content
+          let pageContent = finalContent.replace(
+            '<!-- CHANGELOG_TABLE -->',
+            changelogTable,
+          );
+
+          // Process includes
+          pageContent = await processIncludes(pageContent, componentsDir);
+
+          // Determine output path for this page
+          let pageOutputPath;
+          if (currentPage === 1) {
+            pageOutputPath = path.join(outDir, 'changelog', 'index.html');
+          } else {
+            pageOutputPath = path.join(
+              outDir,
+              'changelog',
+              'page',
+              currentPage.toString(),
+              'index.html',
+            );
+          }
+
+          // Ensure directory exists and write the file
+          await fs.mkdir(path.dirname(pageOutputPath), { recursive: true });
+          await fs.writeFile(pageOutputPath, pageContent);
+        }
         break;
       }
       case 'sitemap.html': {
@@ -839,21 +967,16 @@ async function buildPage(
 
         // Then generate the tree and update the sitemap
         try {
-          const { stdout } = await execAsync(
-            'tree -P "*.html" --prune -d --noreport -I assets/ -I fonts/ --sort=size -r',
-            {
-              cwd: outDir,
-            },
-          );
+          const treeOutput = await generateTree(outDir);
+          console.log('treeOutput: ', treeOutput);
 
           finalContent = finalContent.replace(
             '<!-- COMMAND_OUTPUT -->',
-            stdout.trim(),
+            treeOutput.trim(),
           );
 
           // Write the updated content with the tree output
-          const minifiedFinalContent = minify(finalContent, minifyOptions);
-          await fs.writeFile(outputPath, minifiedFinalContent);
+          await fs.writeFile(outputPath, finalContent);
         } catch (error) {
           logger.error('Failed to generate sitemap tree:', error);
         }
@@ -876,8 +999,7 @@ async function buildPage(
         }
         await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
-        const minifiedContent = minify(finalContent, minifyOptions);
-        await fs.writeFile(outputPath, minifiedContent);
+        await fs.writeFile(outputPath, finalContent);
         break;
       }
     }

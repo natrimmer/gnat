@@ -4,8 +4,6 @@
   "description": "A site about development, design, and I guess anything else.",
   "start_url": "/",
   "display": "minimal-ui",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -22,13 +20,5 @@
   ],
   "orientation": "any",
   "prefer_related_applications": false,
-  "categories": ["design", "development", "blog"],
-  "shortcuts": [
-    {
-      "name": "Open Debug Mode",
-      "short_name": "Debug",
-      "description": "View the monospace grid",
-      "url": "/?debug=true"
-    }
-  ]
+  "categories": ["design", "development", "blog"]
 }

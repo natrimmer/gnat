@@ -176,5 +176,5 @@ draft_*
 **/.DS_Store
 
 # ignore generated files
-public/*.html
-public/*.css
+public/**/*.html
+public/styles.css

@@ -174,3 +174,7 @@ dist
 draft_*
 
 **/.DS_Store
+
+# ignore generated files
+public/**/*.html
+public/styles.css

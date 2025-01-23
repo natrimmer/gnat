@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Personal developer site of gnat" />
-    <title>PWAs and External Resources</title>
+    <title>PWA Resources</title>
     <link rel="icon" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
@@ -97,7 +97,7 @@
     href="/changelog/"
     aria-label="View the changelog"
   >
-    0.1.1
+    0.2.0
   </a>
 </div>
 
@@ -189,93 +189,73 @@
             <div>
   <div class="flex justify-between w-full items-end">
     <h3 class="text-3xl font-semibold">
-      PWAs and External Resources
+      PWA Resources
     </h3>
     <div class="text-right mb-1">
       
       <span class="h-max pb-1">
         <p class="text-xs font-mono text-gray-500">
           posted:
-          2025-01-16
+          2025-01-18
         </p>
       </span>
     </div>
   </div>
   <hr />
-  <div class="bg-gray-100 p-2">
-  <h4 class="text-2xl font-sans">Manifest Breakdown</h4>
-</div>
-<pre>
-  {
-    "name": "gnat.blog",
-    "short_name": "gnat",
-    "description": "A site about development, design, and I guess anything else.",
-    "start_url": "/",
-    "display": "minimal-ui",
-    "icons": [
-      {
-        "src": "/icon-192.png",
-        "sizes": "192x192",
-        "type": "image/png",
-        "purpose": "any maskable"
-      },
-      {
-        "src": "/icon-512.png",
-        "sizes": "512x512",
-        "type": "image/png",
-        "purpose": "any maskable"
-      }
-    ],
-    "orientation": "any",
-    "prefer_related_applications": false,
-    "categories": ["design", "development", "blog"]
-  }
-</pre>
-<div class="font-mono text-sm space-y-1 mt-4 mb-8">
-  <p><code>"name"</code>: Full name shown on install</p>
-  <p><code>"short_name"</code>: Used when space is limited</p>
-  <p><code>"description"</code>: Shown in app stores / install prompts</p>
-  <p><code>"start_url"</code>: Entry point when launched</p>
-  <p>
-    <code>"display"</code>: minimal-ui preserves essential browser navigation
-  </p>
-  <p><code>"icons"</code>: Adaptive icons that work with masks:</p>
-  <p class="pl-4">- 192px for phones/tablets</p>
-  <p class="pl-4">- 512px for high-density displays</p>
-  <p><code>"orientation"</code>: Supports both portrait/landscape</p>
-  <p><code>"prefer_related_applications"</code>: Don't suggest native apps</p>
-  <p><code>"categories"</code>: App store grouping tags</p>
-</div>
-<div class="bg-gray-100 p-2 mt-8">
-  <h4 class="text-2xl font-sans">Resources</h4>
-</div>
+  <table
+  class="w-full border-collapse border border-mondrian_white"
+  aria-describedby="table-note"
+>
+  <caption class="sr-only">
+    Resources for Progressive Web Apps (PWAs)
+  </caption>
+  <thead>
+    <tr class="border-b border-b-black bg-mondrian_white text-left font-sans">
+      <th class="w-1/6 pl-1" scope="col">Site</th>
+      <th scope="col">Description</th>
+      <th class="w-1/12 pl-1" scope="col">Link</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="border-b border-b-gray-300 hover:bg-gray-100">
+      <td class="text-left font-mono text-xs align-top pt-1 pl-1" scope="row">
+        MDN
+      </td>
+      <td class="text-sm align-top py-1">
+        Mozilla Developer Network's guide to Progressive Web Apps.
+      </td>
+      <td class="align-top p-1">
+        <a
+          class="w-full text-xs py-1 px-1 text-black border border-black shadow-mondrian font-mono transition-colors bg-white hover:bg-mondrian_blue hover:text-white text-center inline-block focus:outline focus:outline-offset-2 focus:outline-mondrian_blue"
+          href="https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Mozilla Developer Network's guide to Progressive Web Apps (opens in new tab)"
+        >
+          LINK →
+        </a>
+      </td>
+    </tr>
+  </tbody>
+  <tfoot id="table-note">
+    <tr>
+      <th colspan="3" class="text-xs text-gray-500 p-1 text-left">Notes:</th>
+    </tr>
+    <tr>
+      <td colspan="3" class="text-xs text-gray-500 p-1">
+        If a link is dead or the site is down,
+        <a
+          href="/contact/"
+          class="underline hover:text-mondrian_red transition-colors"
+          aria-label="Contact link"
+          >please let me know</a
+        >.
+      </td>
+    </tr>
+  </tfoot>
+</table>
+
 <ul>
-  <li>
-    <a
-      href="https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps"
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Mozilla Developer Network's guide to Progressive Web Apps (opens in new tab)"
-      class="underline transition-colors hover:text-mondrian_blue font-mono"
-    >
-      → MDN
-      <svg
-        class="inline-block w-4 h-4 ml-1"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-        <polyline points="15 3 21 3 21 9" />
-        <line x1="10" y1="14" x2="21" y2="3" />
-      </svg>
-    </a>
-  </li>
   <li>
     <a
       href="https://docs.pwabuilder.com/#/"
@@ -364,7 +344,7 @@
       class="hover:text-mondrian_yellow transition-colors"
     >
       Last updated:
-      Thu Jan 16 2025
+      Wed Jan 22 2025
     </a>
   </p>
 </footer>

@@ -31,7 +31,7 @@ jobs:
         env:
           BLUESKY_IDENTIFIER: ${{ vars.BLUESKY_IDENTIFIER }}
           BLUESKY_PASSWORD: ${{ secrets.BLUESKY_PASSWORD }}
-        run: node dist/src/build/bluesky_sync.js
+        run: node dist/build/bluesky_sync.js
 
       - name: Commit changes
         run: |

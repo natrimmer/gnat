@@ -31,16 +31,19 @@ jobs:
         env:
           BLUESKY_IDENTIFIER: ${{ vars.BLUESKY_IDENTIFIER }}
           BLUESKY_PASSWORD: ${{ secrets.BLUESKY_PASSWORD }}
-        run: node dist/src/build/bluesky_sync.js
+        run: node dist/build/bluesky_sync.js
 
       - name: Commit changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add content/
+          git status
+          git add .
           git diff --quiet && git diff --staged --quiet || git commit -m "Add new Bluesky posts"
 
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+          force: true

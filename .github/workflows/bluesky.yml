@@ -12,6 +12,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -19,10 +21,7 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: |
-          npm install typescript @types/node
-          npm install @atproto/api
-          npm install winston
+        run: npm install --production
 
       - name: Build TypeScript
         run: npx tsc
@@ -33,17 +32,10 @@ jobs:
           BLUESKY_PASSWORD: ${{ secrets.BLUESKY_PASSWORD }}
         run: node dist/build/bluesky_sync.js
 
-      - name: Commit changes
+      - name: Commit and push
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git status
           git add .
-          git diff --quiet && git diff --staged --quiet || git commit -m "Add new Bluesky posts"
-
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
-          force: true
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Add new Bluesky posts" && git push)

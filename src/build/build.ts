@@ -282,6 +282,7 @@ async function buildPage(
             const feedItemData = await parseMetadata(feedContent);
             const title = feedItemData.title || 'Untitled';
             const date = feedItemData.date || '';
+            const bluesky = feedItemData.bluesky || false;
             const content = feedItemData.content || '';
 
             const wrappedContent = feedItemTemplate
@@ -313,11 +314,23 @@ async function buildPage(
             });
             await fs.writeFile(individualPagePath, individualPageContent);
 
-            // Return feed table row for the main feed page listing
-            return feedTableRowTemplate
-              .replace('<!-- DATE -->', date)
-              .replace('<!-- CONTENT -->', content)
-              .replace('<!-- PATH -->', link);
+            const replacements = {
+              '<!-- DATE -->': date,
+              '<!-- CONTENT -->': content,
+              '<!-- PATH -->': link,
+              '<!-- BLUESKY -->': bluesky
+                ? (await findComponent('bluesky-link', componentsDir)).replace(
+                    '<!-- LINK -->',
+                    bluesky,
+                  )
+                : '',
+            };
+
+            return Object.entries(replacements).reduce(
+              (template, [placeholder, value]) =>
+                template.replace(placeholder, value),
+              feedTableRowTemplate,
+            );
           }),
         );
 

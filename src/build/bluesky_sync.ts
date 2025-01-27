@@ -71,8 +71,6 @@ async function getNewPosts(
       cursor,
       filter: 'posts_no_replies',
     });
-    logger.debug(`Bluesky response: ${JSON.stringify(response.data)}`);
-
     for (const item of response.data.feed) {
       const postDate = new Date(item.post.indexedAt);
       if (lastChecked === '') {

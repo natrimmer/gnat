@@ -135,7 +135,23 @@ async function findComponent(
     // inject last build date in footer
     if (name === 'footer') {
       const footerContent = await fs.readFile(directPath, 'utf-8');
-      const lastBuildDate = new Date().toDateString();
+      let lastBuildDate = new Date().toLocaleDateString('en-US', {
+        timeZone: 'America/Los_Angeles',
+        month: 'short',
+        day: '2-digit',
+        year: 'numeric',
+      });
+
+      try {
+        lastBuildDate = await fs.readFile('src/build/build.log', 'utf-8');
+      } catch (err: any) {
+        if (err.code === 'ENOENT') {
+          console.log('ERROR: No Build.Log file for build date, using today instead');
+        } else {
+          console.log(err);
+        }
+      }
+    
       return footerContent.replace('<!-- LAST_UPDATED -->', lastBuildDate);
     }
 
@@ -164,6 +180,16 @@ async function findComponent(
 
     throw new Error(`Component not found: ${name}`);
   }
+}
+
+async function writeLogDate(){
+  const today = new Date().toLocaleDateString('en-US', {
+     timeZone: "America/Los_Angeles",
+    month : "short",
+    day: "2-digit",
+    year : "numeric",
+  });
+  await fs.writeFile('src/build/build.log', today);
 }
 
 async function processIncludes(
@@ -1054,11 +1080,15 @@ export async function build(options: BuildOptions = {}): Promise<void> {
     if (clean) {
       await cleanDirectory(outDir);
     }
-
+   
     await fs.mkdir(outDir, { recursive: true });
     logger.info('Initiating build process');
-
+    
+    if(!process.argv.includes('--watch')){
+      await writeLogDate();
+    }
     if (includeDrafts) {
+      
       logger.warn('Including draft files in the build');
     } else {
       logger.info('Excluding draft files from the build');

@@ -59,7 +59,8 @@ async function startDevServer() {
   const srcDir = path.join(__dirname, '..', 'src');
   watcher = watch([srcDir], {
     ignored: [
-      /(^|[\/\\])\../,
+      /(^|[\/\\])\../, 
+      /\.log$/,
       '**/node_modules/**',
       '**/public/**',
       '**/*.git/**',

@@ -2,13 +2,16 @@ name: Sync Bluesky Posts
 
 on:
   schedule:
-    - cron: '*/30 * * * *'
+    - cron: "0 0 * * *"
   workflow_dispatch:
 
 jobs:
   sync-posts:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/prod'
+
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
@@ -18,7 +21,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install dependencies
         run: npm install --production
@@ -32,10 +35,4 @@ jobs:
           BLUESKY_PASSWORD: ${{ secrets.BLUESKY_PASSWORD }}
         run: node dist/build/bluesky_sync.js
 
-      - name: Commit and push
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git status
-          git add .
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Add new Bluesky posts" && git push)
+      - uses: stefanzweifel/git-auto-commit-action@v5

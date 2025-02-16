@@ -1,8 +1,8 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { BuildOptions } from 'src/utils/types';
-import { getLogger } from '../utils/logger';
-import { generateTree } from '../utils/tree';
+import fs from "fs/promises";
+import path from "path";
+import { BuildOptions } from "src/utils/types";
+import { getLogger } from "../utils/logger";
+import { generateTree } from "../utils/tree";
 
 interface PageData {
   content: string;
@@ -10,91 +10,16 @@ interface PageData {
   [key: string]: string;
 }
 
-interface TrackingData {
-  tracking: string;
-  year: number;
-  days: {
-    [date: string]: ActivityData;
-  };
-}
-
-type ActivityData = {
-  [key: string]: number | string | ActivityData;
-};
-
-const COLOR_OPTIONS = ['mondrian_yellow', 'mondrian_red', 'mondrian_blue'];
+const COLOR_OPTIONS = ["mondrian_yellow", "mondrian_red", "mondrian_blue"];
 
 function getColorOption(): string {
   return COLOR_OPTIONS[Math.floor(Math.random() * COLOR_OPTIONS.length)];
 }
 
-async function getAllTrackingData(): Promise<TrackingData[]> {
-  try {
-    const trackingPath = path.join(__dirname, '..', 'data', 'tracking');
-    const yearDirs = (await fs.readdir(trackingPath, { withFileTypes: true }))
-      .filter((dirent) => dirent.isDirectory() && !dirent.name.startsWith('.'))
-      .map((dirent) => dirent.name);
-
-    const allTrackingData = await Promise.all(
-      yearDirs.map(async (year) => {
-        const yearPath = path.join(trackingPath, year);
-        const files = (await fs.readdir(yearPath, { withFileTypes: true }))
-          .filter(
-            (dirent) =>
-              dirent.isFile() &&
-              !dirent.name.startsWith('.') &&
-              dirent.name.endsWith('.json'),
-          )
-          .map((dirent) => dirent.name);
-
-        return Promise.all(
-          files.map(async (filename) => {
-            const filePath = path.join(yearPath, filename);
-            const fileContent = await fs.readFile(filePath, 'utf-8');
-
-            try {
-              const data = JSON.parse(fileContent) as TrackingData;
-
-              if (!data.tracking || !data.year || !data.days) {
-                throw new Error(
-                  `Invalid tracking data structure in ${year}/${filename}`,
-                );
-              }
-
-              return data;
-            } catch (parseError) {
-              if (parseError instanceof Error) {
-                throw new Error(
-                  `Failed to parse ${year}/${filename}: ${parseError.message}`,
-                );
-              } else {
-                throw new Error(
-                  `Failed to parse ${year}/${filename}: ${String(parseError)}`,
-                );
-              }
-            }
-          }),
-        );
-      }),
-    ).then((nestedArrays) => nestedArrays.flat());
-
-    return allTrackingData;
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-      return [];
-    }
-    if (error instanceof Error) {
-      throw new Error(`Error reading tracking data: ${error.message}`);
-    } else {
-      throw new Error('Error reading tracking data');
-    }
-  }
-}
-
 async function parseMetadata(content: string): Promise<PageData> {
   const data: PageData = {
     content: content.trim(),
-    template: '',
+    template: "",
   };
 
   const metadataPattern = /<!--\s*(\w+):\s*([^>]*?)\s*-->/g;
@@ -105,7 +30,7 @@ async function parseMetadata(content: string): Promise<PageData> {
   while ((match = metadataPattern.exec(content)) !== null) {
     const [fullMatch, key, value] = match;
 
-    const dataKey = key === 'extends' ? 'template' : key;
+    const dataKey = key === "extends" ? "template" : key;
     data[dataKey] = value;
 
     matches.push({
@@ -133,21 +58,21 @@ async function findComponent(
   const directPath = path.join(componentsDir, `${name}.html`);
   try {
     // inject last build date in footer
-    if (name === 'footer') {
-      const footerContent = await fs.readFile(directPath, 'utf-8');
+    if (name === "footer") {
+      const footerContent = await fs.readFile(directPath, "utf-8");
       const lastBuildDate = new Date().toDateString();
-      return footerContent.replace('<!-- LAST_UPDATED -->', lastBuildDate);
+      return footerContent.replace("<!-- LAST_UPDATED -->", lastBuildDate);
     }
 
     // inject version number from package.json
-    if (name === 'version') {
-      const versionContent = await fs.readFile(directPath, 'utf-8');
-      const packageJson = await fs.readFile('./package.json', 'utf-8');
+    if (name === "version") {
+      const versionContent = await fs.readFile(directPath, "utf-8");
+      const packageJson = await fs.readFile("./package.json", "utf-8");
       const version = JSON.parse(packageJson).version;
-      return versionContent.replace('<!-- VERSION_NUMBER -->', version);
+      return versionContent.replace("<!-- VERSION_NUMBER -->", version);
     }
 
-    return await fs.readFile(directPath, 'utf-8');
+    return await fs.readFile(directPath, "utf-8");
   } catch (error) {
     const entries = await fs.readdir(componentsDir, { withFileTypes: true });
 
@@ -155,7 +80,7 @@ async function findComponent(
       if (entry.isDirectory()) {
         const subPath = path.join(componentsDir, entry.name, `${name}.html`);
         try {
-          return await fs.readFile(subPath, 'utf-8');
+          return await fs.readFile(subPath, "utf-8");
         } catch {
           continue;
         }
@@ -211,16 +136,16 @@ async function buildPage(
 ): Promise<void> {
   const logger = getLogger();
 
-  if (!options.includeDrafts && path.basename(filePath).startsWith('draft_')) {
+  if (!options.includeDrafts && path.basename(filePath).startsWith("draft_")) {
     logger.debug(`Skipping draft file: ${filePath}`);
     return;
   }
 
-  const { srcDir = './src', outDir = './public' } = options;
-  const componentsDir = path.join(srcDir, 'components');
+  const { srcDir = "./src", outDir = "./public" } = options;
+  const componentsDir = path.join(srcDir, "components");
 
   // Read the content file
-  const content = await fs.readFile(filePath, 'utf-8');
+  const content = await fs.readFile(filePath, "utf-8");
   const pageData = await parseMetadata(content);
 
   if (pageData.template) {
@@ -230,40 +155,40 @@ async function buildPage(
       componentsDir,
     );
     let finalContent = templateContent
-      .replace('<!-- TITLE -->', pageData.title)
-      .replace('<!-- CONTENT -->', pageData.content);
+      .replace("<!-- TITLE -->", pageData.title)
+      .replace("<!-- CONTENT -->", pageData.content);
 
     // Process includes
     finalContent = await processIncludes(finalContent, componentsDir);
 
     // Create output path maintaining directory structure
-    const relativePath = path.relative(path.join(srcDir, 'content'), filePath);
+    const relativePath = path.relative(path.join(srcDir, "content"), filePath);
 
     switch (path.basename(filePath)) {
-      case 'feed.html': {
+      case "feed.html": {
         const feedTableRowTemplate = await findComponent(
-          'feed-table-row',
+          "feed-table-row",
           componentsDir,
         );
         const feedTableTemplate = await findComponent(
-          'feed-table',
+          "feed-table",
           componentsDir,
         );
         const feedItemTemplate = await findComponent(
-          'feed-item',
+          "feed-item",
           componentsDir,
         );
 
-        const outputPath = path.join(outDir, 'feed', 'index.html');
+        const outputPath = path.join(outDir, "feed", "index.html");
         await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
         // Get all feed content files
-        const feedDir = path.join(srcDir, 'content', 'feed');
+        const feedDir = path.join(srcDir, "content", "feed");
         const feedFiles = (await fs.readdir(feedDir))
           .filter((file) => {
             return (
-              file.endsWith('.html') &&
-              (options.includeDrafts || !file.startsWith('draft_'))
+              file.endsWith(".html") &&
+              (options.includeDrafts || !file.startsWith("draft_"))
             );
           })
           .sort((a, b) => b.localeCompare(a)); // Sort in reverse order (newest first)
@@ -273,28 +198,28 @@ async function buildPage(
           feedFiles.map(async (file) => {
             const feedContent = await fs.readFile(
               path.join(feedDir, file),
-              'utf-8',
+              "utf-8",
             );
 
-            const feedId = path.basename(file, '.html');
+            const feedId = path.basename(file, ".html");
             const link = `/feed/${feedId}/`;
 
             const feedItemData = await parseMetadata(feedContent);
-            const title = feedItemData.title || 'Untitled';
-            const date = feedItemData.date || '';
+            const title = feedItemData.title || "Untitled";
+            const date = feedItemData.date || "";
             const bluesky = feedItemData.bluesky || false;
-            const content = feedItemData.content || '';
+            const content = feedItemData.content || "";
 
             const wrappedContent = feedItemTemplate
-              .replace('<!-- DATE -->', date)
-              .replace('<!-- TITLE -->', title)
-              .replace('<!-- CONTENT -->', content);
+              .replace("<!-- DATE -->", date)
+              .replace("<!-- TITLE -->", title)
+              .replace("<!-- CONTENT -->", content);
 
             // Then load the base template and inject the wrapped content
-            const baseTemplate = await findComponent('base', componentsDir);
+            const baseTemplate = await findComponent("base", componentsDir);
             let individualPageContent = baseTemplate
-              .replace('<!-- TITLE -->', title)
-              .replace('<!-- CONTENT -->', wrappedContent);
+              .replace("<!-- TITLE -->", title)
+              .replace("<!-- CONTENT -->", wrappedContent);
 
             // Process includes for the base template
             individualPageContent = await processIncludes(
@@ -305,9 +230,9 @@ async function buildPage(
             // Always put feed items in /feed directory
             const individualPagePath = path.join(
               outDir,
-              'feed',
+              "feed",
               feedId,
-              'index.html',
+              "index.html",
             );
             await fs.mkdir(path.dirname(individualPagePath), {
               recursive: true,
@@ -315,15 +240,15 @@ async function buildPage(
             await fs.writeFile(individualPagePath, individualPageContent);
 
             const replacements = {
-              '<!-- DATE -->': date,
-              '<!-- CONTENT -->': content,
-              '<!-- PATH -->': link,
-              '<!-- BLUESKY -->': bluesky
-                ? (await findComponent('bluesky-link', componentsDir)).replace(
-                    '<!-- LINK -->',
+              "<!-- DATE -->": date,
+              "<!-- CONTENT -->": content,
+              "<!-- PATH -->": link,
+              "<!-- BLUESKY -->": bluesky
+                ? (await findComponent("bluesky-link", componentsDir)).replace(
+                    "<!-- LINK -->",
                     bluesky,
                   )
-                : '',
+                : "",
             };
 
             return Object.entries(replacements).reduce(
@@ -339,15 +264,15 @@ async function buildPage(
         const totalPages = Math.ceil(feedItems.length / ITEMS_PER_PAGE);
 
         const feedTableFooterTemplate = await findComponent(
-          'feed-table-footer',
+          "feed-table-footer",
           componentsDir,
         );
         const feedTableNextLinkTemplate = await findComponent(
-          'table-next-link',
+          "table-next-link",
           componentsDir,
         );
         const feedTablePrevLinkTemplate = await findComponent(
-          'table-prev-link',
+          "table-prev-link",
           componentsDir,
         );
 
@@ -359,62 +284,62 @@ async function buildPage(
 
           // Create the feed table with the paginated items
           let feedTable = feedTableTemplate.replace(
-            '<!-- FEED_ROWS -->',
-            paginatedItems.join('\n'),
+            "<!-- FEED_ROWS -->",
+            paginatedItems.join("\n"),
           );
 
           // Add footer with pagination
           let footer = feedTableFooterTemplate
-            .replace('<!-- CURRENT_PAGE -->', currentPage.toString())
-            .replace('<!-- TOTAL_PAGES -->', totalPages.toString());
+            .replace("<!-- CURRENT_PAGE -->", currentPage.toString())
+            .replace("<!-- TOTAL_PAGES -->", totalPages.toString());
 
           // Add navigation links
           const prevPagePath =
             currentPage > 1
               ? currentPage === 2
-                ? '/feed/'
+                ? "/feed/"
                 : `/feed/page/${currentPage - 1}/`
-              : '';
+              : "";
           const nextPagePath =
-            currentPage < totalPages ? `/feed/page/${currentPage + 1}/` : '';
+            currentPage < totalPages ? `/feed/page/${currentPage + 1}/` : "";
 
           if (prevPagePath) {
             footer = footer.replace(
-              '<!-- FEED_TABLE_PREV_LINK -->',
+              "<!-- FEED_TABLE_PREV_LINK -->",
               feedTablePrevLinkTemplate
-                .replace('<!-- PATH -->', prevPagePath)
-                .replace('<!-- COLOR -->', getColorOption()),
+                .replace("<!-- PATH -->", prevPagePath)
+                .replace("<!-- COLOR -->", getColorOption()),
             );
           }
 
           if (nextPagePath) {
             footer = footer.replace(
-              '<!-- FEED_TABLE_NEXT_LINK -->',
+              "<!-- FEED_TABLE_NEXT_LINK -->",
               feedTableNextLinkTemplate
-                .replace('<!-- PATH -->', nextPagePath)
-                .replace('<!-- COLOR -->', getColorOption()),
+                .replace("<!-- PATH -->", nextPagePath)
+                .replace("<!-- COLOR -->", getColorOption()),
             );
           }
 
-          feedTable = feedTable.replace('<!-- FEED_TABLE_FOOTER -->', footer);
+          feedTable = feedTable.replace("<!-- FEED_TABLE_FOOTER -->", footer);
 
           // Create the full page content
           let pageContent = finalContent.replace(
-            '<!-- FEED_TABLE -->',
+            "<!-- FEED_TABLE -->",
             feedTable,
           );
 
           // Determine output path for this page
           let pageOutputPath;
           if (currentPage === 1) {
-            pageOutputPath = path.join(outDir, 'feed', 'index.html');
+            pageOutputPath = path.join(outDir, "feed", "index.html");
           } else {
             pageOutputPath = path.join(
               outDir,
-              'feed',
-              'page',
+              "feed",
+              "page",
               currentPage.toString(),
-              'index.html',
+              "index.html",
             );
           }
 
@@ -424,30 +349,30 @@ async function buildPage(
         }
         break;
       }
-      case 'notes.html': {
+      case "notes.html": {
         const articleTableRowTemplate = await findComponent(
-          'article-table-row',
+          "article-table-row",
           componentsDir,
         );
         const articleTableTemplate = await findComponent(
-          'article-table',
+          "article-table",
           componentsDir,
         );
         const articleItemTemplate = await findComponent(
-          'article-item',
+          "article-item",
           componentsDir,
         );
 
-        const outputPath = path.join(outDir, 'notes', 'index.html');
+        const outputPath = path.join(outDir, "notes", "index.html");
         await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
         // Get all article content files
-        const notesDir = path.join(srcDir, 'content', 'notes');
+        const notesDir = path.join(srcDir, "content", "notes");
         const notesFiles = (await fs.readdir(notesDir))
           .filter((file) => {
             return (
-              file.endsWith('.html') &&
-              (options.includeDrafts || !file.startsWith('draft_'))
+              file.endsWith(".html") &&
+              (options.includeDrafts || !file.startsWith("draft_"))
             );
           })
           .sort((a, b) => b.localeCompare(a));
@@ -457,37 +382,37 @@ async function buildPage(
           notesFiles.map(async (note) => {
             const noteContent = await fs.readFile(
               path.join(notesDir, note),
-              'utf-8',
+              "utf-8",
             );
 
-            const noteId = path.basename(note, '.html');
+            const noteId = path.basename(note, ".html");
             const link = `/notes/${noteId}/`;
 
             const noteItemData = await parseMetadata(noteContent);
-            const title = noteItemData.title || 'Untitled';
-            const date = noteItemData.date || '';
-            const content = noteItemData.content || '';
-            let updated = noteItemData.updated || '';
+            const title = noteItemData.title || "Untitled";
+            const date = noteItemData.date || "";
+            const content = noteItemData.content || "";
+            let updated = noteItemData.updated || "";
 
-            if (updated && updated !== '') {
+            if (updated && updated !== "") {
               const updateTemplate = await findComponent(
-                'update',
+                "update",
                 componentsDir,
               );
-              updated = updateTemplate.replace('<!-- UPDATED -->', updated);
+              updated = updateTemplate.replace("<!-- UPDATED -->", updated);
             }
 
             const wrappedContent = articleItemTemplate
-              .replace('<!-- DATE -->', date)
-              .replace('<!-- UPDATE -->', updated)
-              .replace('<!-- TITLE -->', title)
-              .replace('<!-- CONTENT -->', content);
+              .replace("<!-- DATE -->", date)
+              .replace("<!-- UPDATE -->", updated)
+              .replace("<!-- TITLE -->", title)
+              .replace("<!-- CONTENT -->", content);
 
             // Then load the base template and inject the wrapped content
-            const baseTemplate = await findComponent('base', componentsDir);
+            const baseTemplate = await findComponent("base", componentsDir);
             let individualPageContent = baseTemplate
-              .replace('<!-- TITLE -->', title)
-              .replace('<!-- CONTENT -->', wrappedContent);
+              .replace("<!-- TITLE -->", title)
+              .replace("<!-- CONTENT -->", wrappedContent);
 
             // Process includes for the base template
             individualPageContent = await processIncludes(
@@ -498,9 +423,9 @@ async function buildPage(
             // Always put feed items in /feed directory
             const individualPagePath = path.join(
               outDir,
-              'notes',
+              "notes",
               noteId,
-              'index.html',
+              "index.html",
             );
             await fs.mkdir(path.dirname(individualPagePath), {
               recursive: true,
@@ -509,9 +434,9 @@ async function buildPage(
 
             // Return note table row for the main note page listing
             return articleTableRowTemplate
-              .replace('<!-- DATE -->', date)
-              .replace('<!-- TITLE -->', title)
-              .replace('<!-- PATH -->', link);
+              .replace("<!-- DATE -->", date)
+              .replace("<!-- TITLE -->", title)
+              .replace("<!-- PATH -->", link);
           }),
         );
 
@@ -520,15 +445,15 @@ async function buildPage(
         const totalPages = Math.ceil(notes.length / ITEMS_PER_PAGE);
 
         const articleTableFooterTemplate = await findComponent(
-          'article-table-footer',
+          "article-table-footer",
           componentsDir,
         );
         const articleTableNextLinkTemplate = await findComponent(
-          'table-next-link',
+          "table-next-link",
           componentsDir,
         );
         const articleTablePrevLinkTemplate = await findComponent(
-          'table-prev-link',
+          "table-prev-link",
           componentsDir,
         );
 
@@ -539,65 +464,65 @@ async function buildPage(
           const paginatedItems = notes.slice(startIndex, endIndex);
 
           let noteTable = articleTableTemplate.replace(
-            '<!-- ARTICLE_ROWS -->',
-            paginatedItems.join('\n'),
+            "<!-- ARTICLE_ROWS -->",
+            paginatedItems.join("\n"),
           );
 
           // Add footer with pagination
           let footer = articleTableFooterTemplate
-            .replace('<!-- CURRENT_PAGE -->', currentPage.toString())
-            .replace('<!-- TOTAL_PAGES -->', totalPages.toString());
+            .replace("<!-- CURRENT_PAGE -->", currentPage.toString())
+            .replace("<!-- TOTAL_PAGES -->", totalPages.toString());
 
           // Add navigation links
           const prevPagePath =
             currentPage > 1
               ? currentPage === 2
-                ? '/notes/'
+                ? "/notes/"
                 : `/notes/page/${currentPage - 1}/`
-              : '';
+              : "";
           const nextPagePath =
-            currentPage < totalPages ? `/notes/page/${currentPage + 1}/` : '';
+            currentPage < totalPages ? `/notes/page/${currentPage + 1}/` : "";
 
           if (prevPagePath) {
             footer = footer.replace(
-              '<!-- ARTICLE_TABLE_PREV_LINK -->',
+              "<!-- ARTICLE_TABLE_PREV_LINK -->",
               articleTablePrevLinkTemplate
-                .replace('<!-- PATH -->', prevPagePath)
-                .replace('<!-- COLOR -->', getColorOption()),
+                .replace("<!-- PATH -->", prevPagePath)
+                .replace("<!-- COLOR -->", getColorOption()),
             );
           }
 
           if (nextPagePath) {
             footer = footer.replace(
-              '<!-- ARTICLE_TABLE_NEXT_LINK -->',
+              "<!-- ARTICLE_TABLE_NEXT_LINK -->",
               articleTableNextLinkTemplate
-                .replace('<!-- PATH -->', nextPagePath)
-                .replace('<!-- COLOR -->', getColorOption()),
+                .replace("<!-- PATH -->", nextPagePath)
+                .replace("<!-- COLOR -->", getColorOption()),
             );
           }
 
           noteTable = noteTable.replace(
-            '<!-- ARTICLE_TABLE_FOOTER -->',
+            "<!-- ARTICLE_TABLE_FOOTER -->",
             footer,
           );
 
           // Create the full page content
           let pageContent = finalContent.replace(
-            '<!-- NOTES_TABLE -->',
+            "<!-- NOTES_TABLE -->",
             noteTable,
           );
 
           // Determine output path for this page
           let pageOutputPath;
           if (currentPage === 1) {
-            pageOutputPath = path.join(outDir, 'notes', 'index.html');
+            pageOutputPath = path.join(outDir, "notes", "index.html");
           } else {
             pageOutputPath = path.join(
               outDir,
-              'notes',
-              'page',
+              "notes",
+              "page",
               currentPage.toString(),
-              'index.html',
+              "index.html",
             );
           }
 
@@ -607,30 +532,30 @@ async function buildPage(
         }
         break;
       }
-      case 'articles.html': {
+      case "articles.html": {
         const articleTableRowTemplate = await findComponent(
-          'article-table-row',
+          "article-table-row",
           componentsDir,
         );
         const articleTableTemplate = await findComponent(
-          'article-table',
+          "article-table",
           componentsDir,
         );
         const articleItemTemplate = await findComponent(
-          'article-item',
+          "article-item",
           componentsDir,
         );
 
-        const outputPath = path.join(outDir, 'articles', 'index.html');
+        const outputPath = path.join(outDir, "articles", "index.html");
         await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
         // Get all article content files
-        const articleDir = path.join(srcDir, 'content', 'articles');
+        const articleDir = path.join(srcDir, "content", "articles");
         const articleFiles = (await fs.readdir(articleDir))
           .filter((file) => {
             return (
-              file.endsWith('.html') &&
-              (options.includeDrafts || !file.startsWith('draft_'))
+              file.endsWith(".html") &&
+              (options.includeDrafts || !file.startsWith("draft_"))
             );
           })
           .sort((a, b) => b.localeCompare(a)); // Sort in reverse order (newest first)
@@ -640,37 +565,37 @@ async function buildPage(
           articleFiles.map(async (article) => {
             const articleContent = await fs.readFile(
               path.join(articleDir, article),
-              'utf-8',
+              "utf-8",
             );
 
-            const articleId = path.basename(article, '.html');
+            const articleId = path.basename(article, ".html");
             const link = `/articles/${articleId}/`;
 
             const articleItemData = await parseMetadata(articleContent);
-            const title = articleItemData.title || 'Untitled';
-            const date = articleItemData.date || '';
-            const content = articleItemData.content || '';
-            let updated = articleItemData.updated || '';
+            const title = articleItemData.title || "Untitled";
+            const date = articleItemData.date || "";
+            const content = articleItemData.content || "";
+            let updated = articleItemData.updated || "";
 
-            if (updated && updated !== '') {
+            if (updated && updated !== "") {
               const updateTemplate = await findComponent(
-                'update',
+                "update",
                 componentsDir,
               );
-              updated = updateTemplate.replace('<!-- UPDATED -->', updated);
+              updated = updateTemplate.replace("<!-- UPDATED -->", updated);
             }
 
             const wrappedContent = articleItemTemplate
-              .replace('<!-- DATE -->', date)
-              .replace('<!-- UPDATE -->', updated)
-              .replace('<!-- TITLE -->', title)
-              .replace('<!-- CONTENT -->', content);
+              .replace("<!-- DATE -->", date)
+              .replace("<!-- UPDATE -->", updated)
+              .replace("<!-- TITLE -->", title)
+              .replace("<!-- CONTENT -->", content);
 
             // Then load the base template and inject the wrapped content
-            const baseTemplate = await findComponent('base', componentsDir);
+            const baseTemplate = await findComponent("base", componentsDir);
             let individualPageContent = baseTemplate
-              .replace('<!-- TITLE -->', title)
-              .replace('<!-- CONTENT -->', wrappedContent);
+              .replace("<!-- TITLE -->", title)
+              .replace("<!-- CONTENT -->", wrappedContent);
 
             // Process includes for the base template
             individualPageContent = await processIncludes(
@@ -681,9 +606,9 @@ async function buildPage(
             // Always put feed items in /feed directory
             const individualPagePath = path.join(
               outDir,
-              'articles',
+              "articles",
               articleId,
-              'index.html',
+              "index.html",
             );
             await fs.mkdir(path.dirname(individualPagePath), {
               recursive: true,
@@ -692,9 +617,9 @@ async function buildPage(
 
             // Return feed table row for the main feed page listing
             return articleTableRowTemplate
-              .replace('<!-- DATE -->', date)
-              .replace('<!-- TITLE -->', title)
-              .replace('<!-- PATH -->', link);
+              .replace("<!-- DATE -->", date)
+              .replace("<!-- TITLE -->", title)
+              .replace("<!-- PATH -->", link);
           }),
         );
 
@@ -703,15 +628,15 @@ async function buildPage(
         const totalPages = Math.ceil(articles.length / ITEMS_PER_PAGE);
 
         const articleTableFooterTemplate = await findComponent(
-          'article-table-footer',
+          "article-table-footer",
           componentsDir,
         );
         const articleTableNextLinkTemplate = await findComponent(
-          'table-next-link',
+          "table-next-link",
           componentsDir,
         );
         const articleTablePrevLinkTemplate = await findComponent(
-          'table-prev-link',
+          "table-prev-link",
           componentsDir,
         );
 
@@ -722,67 +647,67 @@ async function buildPage(
           const paginatedItems = articles.slice(startIndex, endIndex);
 
           let articleTable = articleTableTemplate.replace(
-            '<!-- ARTICLE_ROWS -->',
-            paginatedItems.join('\n'),
+            "<!-- ARTICLE_ROWS -->",
+            paginatedItems.join("\n"),
           );
 
           // Add footer with pagination
           let footer = articleTableFooterTemplate
-            .replace('<!-- CURRENT_PAGE -->', currentPage.toString())
-            .replace('<!-- TOTAL_PAGES -->', totalPages.toString());
+            .replace("<!-- CURRENT_PAGE -->", currentPage.toString())
+            .replace("<!-- TOTAL_PAGES -->", totalPages.toString());
 
           // Add navigation links
           const prevPagePath =
             currentPage > 1
               ? currentPage === 2
-                ? '/articles/'
+                ? "/articles/"
                 : `/articles/page/${currentPage - 1}/`
-              : '';
+              : "";
           const nextPagePath =
             currentPage < totalPages
               ? `/articles/page/${currentPage + 1}/`
-              : '';
+              : "";
 
           if (prevPagePath) {
             footer = footer.replace(
-              '<!-- ARTICLE_TABLE_PREV_LINK -->',
+              "<!-- ARTICLE_TABLE_PREV_LINK -->",
               articleTablePrevLinkTemplate
-                .replace('<!-- PATH -->', prevPagePath)
-                .replace('<!-- COLOR -->', getColorOption()),
+                .replace("<!-- PATH -->", prevPagePath)
+                .replace("<!-- COLOR -->", getColorOption()),
             );
           }
 
           if (nextPagePath) {
             footer = footer.replace(
-              '<!-- ARTICLE_TABLE_NEXT_LINK -->',
+              "<!-- ARTICLE_TABLE_NEXT_LINK -->",
               articleTableNextLinkTemplate
-                .replace('<!-- PATH -->', nextPagePath)
-                .replace('<!-- COLOR -->', getColorOption()),
+                .replace("<!-- PATH -->", nextPagePath)
+                .replace("<!-- COLOR -->", getColorOption()),
             );
           }
 
           articleTable = articleTable.replace(
-            '<!-- ARTICLE_TABLE_FOOTER -->',
+            "<!-- ARTICLE_TABLE_FOOTER -->",
             footer,
           );
 
           // Create the full page content
           let pageContent = finalContent.replace(
-            '<!-- ARTICLE_TABLE -->',
+            "<!-- ARTICLE_TABLE -->",
             articleTable,
           );
 
           // Determine output path for this page
           let pageOutputPath;
           if (currentPage === 1) {
-            pageOutputPath = path.join(outDir, 'articles', 'index.html');
+            pageOutputPath = path.join(outDir, "articles", "index.html");
           } else {
             pageOutputPath = path.join(
               outDir,
-              'articles',
-              'page',
+              "articles",
+              "page",
               currentPage.toString(),
-              'index.html',
+              "index.html",
             );
           }
 
@@ -792,46 +717,46 @@ async function buildPage(
         }
         break;
       }
-      case 'tracking.html': {
+      case "tracking.html": {
         let outputPath;
-        if (path.basename(relativePath) === 'index.html') {
+        if (path.basename(relativePath) === "index.html") {
           outputPath = path.join(outDir, relativePath);
         } else {
-          const dirname = path.basename(relativePath, '.html');
+          const dirname = path.basename(relativePath, ".html");
           if (
-            relativePath.includes(path.join('feed', '')) ||
-            relativePath.includes(path.join('articles', '')) ||
-            relativePath.includes(path.join('notes', ''))
+            relativePath.includes(path.join("feed", "")) ||
+            relativePath.includes(path.join("articles", "")) ||
+            relativePath.includes(path.join("notes", ""))
           ) {
             return;
           }
-          outputPath = path.join(outDir, dirname, 'index.html');
+          outputPath = path.join(outDir, dirname, "index.html");
         }
         await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
         await fs.writeFile(outputPath, finalContent);
         break;
       }
-      case 'changelog.html': {
+      case "changelog.html": {
         const changelogTableRowTemplate = await findComponent(
-          'changelog-table-row',
+          "changelog-table-row",
           componentsDir,
         );
         const changelogTableTemplate = await findComponent(
-          'changelog-table',
+          "changelog-table",
           componentsDir,
         );
 
-        const outputPath = path.join(outDir, 'changelog', 'index.html');
+        const outputPath = path.join(outDir, "changelog", "index.html");
         await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
         // Get all changelog content files
-        const changelogDir = path.join(srcDir, 'content', 'changelog');
+        const changelogDir = path.join(srcDir, "content", "changelog");
         const changelogFiles = (await fs.readdir(changelogDir))
           .filter((file) => {
             return (
-              file.endsWith('.html') &&
-              (options.includeDrafts || !file.startsWith('draft_'))
+              file.endsWith(".html") &&
+              (options.includeDrafts || !file.startsWith("draft_"))
             );
           })
           .sort((a, b) => b.localeCompare(a)); // Sort in reverse order (newest first)
@@ -841,34 +766,34 @@ async function buildPage(
           changelogFiles.map(async (file) => {
             const changelogContent = await fs.readFile(
               path.join(changelogDir, file),
-              'utf-8',
+              "utf-8",
             );
 
             const changelogItemData = await parseMetadata(changelogContent);
-            const version = changelogItemData.version || '';
-            const date = changelogItemData.date || '';
-            const content = changelogItemData.content || '';
-            let link = changelogItemData.link || '';
+            const version = changelogItemData.version || "";
+            const date = changelogItemData.date || "";
+            const content = changelogItemData.content || "";
+            let link = changelogItemData.link || "";
 
             let rowContent = changelogTableRowTemplate;
 
             // First replace version, date, and changes
             rowContent = rowContent
-              .replace('<!-- VERSION -->', version)
-              .replace('<!-- DATE -->', date)
-              .replace('<!-- CHANGES -->', content);
+              .replace("<!-- VERSION -->", version)
+              .replace("<!-- DATE -->", date)
+              .replace("<!-- CHANGES -->", content);
 
             // Then handle the link if it exists
-            if (link && link !== '') {
+            if (link && link !== "") {
               const changelogTableLinkTemplate = await findComponent(
-                'changelog-table-link',
+                "changelog-table-link",
                 componentsDir,
               );
               const linkHtml = changelogTableLinkTemplate
-                .replace('<!-- LINK -->', link)
-                .replace('<!-- VERSION -->', version)
-                .replace('<!-- COLOR -->', getColorOption());
-              rowContent = rowContent.replace('<!-- LINK -->', linkHtml);
+                .replace("<!-- LINK -->", link)
+                .replace("<!-- VERSION -->", version)
+                .replace("<!-- COLOR -->", getColorOption());
+              rowContent = rowContent.replace("<!-- LINK -->", linkHtml);
             }
 
             return rowContent;
@@ -880,15 +805,15 @@ async function buildPage(
         const totalPages = Math.ceil(entries.length / ITEMS_PER_PAGE);
 
         const changelogTableFooterTemplate = await findComponent(
-          'changelog-table-footer',
+          "changelog-table-footer",
           componentsDir,
         );
         const changelogTableNextLinkTemplate = await findComponent(
-          'table-next-link',
+          "table-next-link",
           componentsDir,
         );
         const changelogTablePrevLinkTemplate = await findComponent(
-          'table-prev-link',
+          "table-prev-link",
           componentsDir,
         );
 
@@ -899,50 +824,50 @@ async function buildPage(
           const paginatedItems = entries.slice(startIndex, endIndex);
 
           let changelogTable = changelogTableTemplate.replace(
-            '<!-- ROWS -->',
-            paginatedItems.join('\n'),
+            "<!-- ROWS -->",
+            paginatedItems.join("\n"),
           );
 
           // Add footer with pagination
           let footer = changelogTableFooterTemplate
-            .replace('<!-- CURRENT_PAGE -->', currentPage.toString())
-            .replace('<!-- TOTAL_PAGES -->', totalPages.toString());
+            .replace("<!-- CURRENT_PAGE -->", currentPage.toString())
+            .replace("<!-- TOTAL_PAGES -->", totalPages.toString());
 
           // Add navigation links
           const prevPagePath =
             currentPage > 1
               ? currentPage === 2
-                ? '/changelog/'
+                ? "/changelog/"
                 : `/changelog/page/${currentPage - 1}/`
-              : '';
+              : "";
           const nextPagePath =
             currentPage < totalPages
               ? `/changelog/page/${currentPage + 1}/`
-              : '';
+              : "";
 
           if (prevPagePath) {
             footer = footer.replace(
-              '<!-- PREV_LINK -->',
+              "<!-- PREV_LINK -->",
               changelogTablePrevLinkTemplate
-                .replace('<!-- PATH -->', prevPagePath)
-                .replace('<!-- COLOR -->', getColorOption()),
+                .replace("<!-- PATH -->", prevPagePath)
+                .replace("<!-- COLOR -->", getColorOption()),
             );
           }
 
           if (nextPagePath) {
             footer = footer.replace(
-              '<!-- NEXT_LINK -->',
+              "<!-- NEXT_LINK -->",
               changelogTableNextLinkTemplate
-                .replace('<!-- PATH -->', nextPagePath)
-                .replace('<!-- COLOR -->', getColorOption()),
+                .replace("<!-- PATH -->", nextPagePath)
+                .replace("<!-- COLOR -->", getColorOption()),
             );
           }
 
-          changelogTable = changelogTable.replace('<!-- FOOTER -->', footer);
+          changelogTable = changelogTable.replace("<!-- FOOTER -->", footer);
 
           // Create the full page content
           let pageContent = finalContent.replace(
-            '<!-- CHANGELOG_TABLE -->',
+            "<!-- CHANGELOG_TABLE -->",
             changelogTable,
           );
 
@@ -952,14 +877,14 @@ async function buildPage(
           // Determine output path for this page
           let pageOutputPath;
           if (currentPage === 1) {
-            pageOutputPath = path.join(outDir, 'changelog', 'index.html');
+            pageOutputPath = path.join(outDir, "changelog", "index.html");
           } else {
             pageOutputPath = path.join(
               outDir,
-              'changelog',
-              'page',
+              "changelog",
+              "page",
               currentPage.toString(),
-              'index.html',
+              "index.html",
             );
           }
 
@@ -969,10 +894,10 @@ async function buildPage(
         }
         break;
       }
-      case 'sitemap.html': {
-        logger.info('Processing sitemap');
+      case "sitemap.html": {
+        logger.info("Processing sitemap");
 
-        const outputPath = path.join(outDir, 'sitemap', 'index.html');
+        const outputPath = path.join(outDir, "sitemap", "index.html");
         await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
         // First, generate the sitemap without the tree
@@ -981,34 +906,34 @@ async function buildPage(
         // Then generate the tree and update the sitemap
         try {
           const treeOutput = await generateTree(outDir);
-          console.log('treeOutput: ', treeOutput);
+          console.log("treeOutput: ", treeOutput);
 
           finalContent = finalContent.replace(
-            '<!-- COMMAND_OUTPUT -->',
+            "<!-- COMMAND_OUTPUT -->",
             treeOutput.trim(),
           );
 
           // Write the updated content with the tree output
           await fs.writeFile(outputPath, finalContent);
         } catch (error) {
-          logger.error('Failed to generate sitemap tree:', error);
+          logger.error("Failed to generate sitemap tree:", error);
         }
         break;
       }
       default: {
         let outputPath;
-        if (path.basename(relativePath) === 'index.html') {
+        if (path.basename(relativePath) === "index.html") {
           outputPath = path.join(outDir, relativePath);
         } else {
-          const dirname = path.basename(relativePath, '.html');
+          const dirname = path.basename(relativePath, ".html");
           if (
-            relativePath.includes(path.join('feed', '')) ||
-            relativePath.includes(path.join('articles', '')) ||
-            relativePath.includes(path.join('notes', ''))
+            relativePath.includes(path.join("feed", "")) ||
+            relativePath.includes(path.join("articles", "")) ||
+            relativePath.includes(path.join("notes", ""))
           ) {
             return;
           }
-          outputPath = path.join(outDir, dirname, 'index.html');
+          outputPath = path.join(outDir, dirname, "index.html");
         }
         await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
@@ -1031,7 +956,7 @@ async function getAllContentFiles(dir: string): Promise<string[]> {
 
       if (entry.isDirectory()) {
         await scan(fullPath);
-      } else if (entry.name.endsWith('.html')) {
+      } else if (entry.name.endsWith(".html")) {
         files.push(fullPath);
       }
     }
@@ -1044,8 +969,8 @@ async function getAllContentFiles(dir: string): Promise<string[]> {
 export async function build(options: BuildOptions = {}): Promise<void> {
   const logger = getLogger();
   const {
-    srcDir = './src',
-    outDir = './public',
+    srcDir = "./src",
+    outDir = "./public",
     clean = true,
     includeDrafts,
   } = options;
@@ -1056,37 +981,33 @@ export async function build(options: BuildOptions = {}): Promise<void> {
     }
 
     await fs.mkdir(outDir, { recursive: true });
-    logger.info('Initiating build process');
+    logger.info("Initiating build process");
 
     if (includeDrafts) {
-      logger.warn('Including draft files in the build');
+      logger.warn("Including draft files in the build");
     } else {
-      logger.info('Excluding draft files from the build');
+      logger.info("Excluding draft files from the build");
     }
 
-    const trackingData = await getAllTrackingData();
-    console.log('td: ', trackingData);
-    logger.debug('Loaded tracking data:', trackingData);
-
-    const contentDir = path.join(srcDir, 'content');
+    const contentDir = path.join(srcDir, "content");
     const files = await getAllContentFiles(contentDir);
 
     // First, build all pages
     await Promise.all(
       files
-        .filter((file) => !file.endsWith('sitemap.html'))
+        .filter((file) => !file.endsWith("sitemap.html"))
         .map((file) => buildPage(file, options)),
     );
 
     // Then, build the sitemap
-    const sitemapFile = files.find((file) => file.endsWith('sitemap.html'));
+    const sitemapFile = files.find((file) => file.endsWith("sitemap.html"));
     if (sitemapFile) {
       await buildPage(sitemapFile, options);
     }
 
-    logger.info('Build completed successfully');
+    logger.info("Build completed successfully");
   } catch (error) {
-    logger.error('Build failed:', error);
+    logger.error("Build failed:", error);
     throw error;
   }
 }
@@ -1109,7 +1030,7 @@ async function cleanDirectory(directory: string): Promise<void> {
           await fs.rmdir(fullPath);
           logger.debug(`Removed empty directory: ${fullPath}`);
         }
-      } else if (file.name.endsWith('.html')) {
+      } else if (file.name.endsWith(".html")) {
         await fs.unlink(fullPath);
         logger.debug(`Removed HTML file: ${fullPath}`);
       }

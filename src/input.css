@@ -1,83 +1,117 @@
-@font-face {
-  font-family: 'Atkinson Hyperlegible';
-  src: url('/fonts/Atkinson-Hyperlegible-Regular-102a.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
+@import "tailwindcss";
+
+@plugin '@tailwindcss/typography';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/container-queries';
+@plugin '@tailwindcss/aspect-ratio';
+
+@theme {
+  --font-sans: Atkinson Hyperlegible, system-ui, sans-serif;
+  --font-mono: Berkeley Mono, monospace;
+
+  --color-mondrian_black: #272a31;
+  --color-mondrian_white: #e7e4e1;
+  --color-mondrian_red: #b82116;
+  --color-mondrian_yellow: #e0b705;
+  --color-mondrian_blue: #3d51ba;
+
+  --shadow-mondrian: 2px 2px var(--color-mondrian_black);
+  --shadow-mondrian_xl: 4px 4px var(--color-mondrian_black);
+  --shadow-mondrian_inverse: -2px -2px var(--color-mondrian_black);
+  --shadow-mondrian_inverse_xl: -4px -4px var(--color-mondrian_black);
 }
 
-@font-face {
-  font-family: 'Atkinson Hyperlegible';
-  src: url('/fonts/Atkinson-Hyperlegible-Italic-102a.woff2') format('woff2');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
 }
 
-@font-face {
-  font-family: 'Atkinson Hyperlegible';
-  src: url('/fonts/Atkinson-Hyperlegible-Bold-102a.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
+@layer base {
+  @font-face {
+    font-family: "Atkinson Hyperlegible";
+    src: url("/fonts/Atkinson-Hyperlegible-Regular-102a.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
 
-@font-face {
-  font-family: 'Atkinson Hyperlegible';
-  src: url('/fonts/Atkinson-Hyperlegible-BoldItalic-102a.woff2') format('woff2');
-  font-weight: 700;
-  font-style: italic;
-  font-display: swap;
-}
+  @font-face {
+    font-family: "Atkinson Hyperlegible";
+    src: url("/fonts/Atkinson-Hyperlegible-Italic-102a.woff2") format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
 
-@font-face {
-  font-family: 'Berkeley Mono';
-  src:
-    url('/fonts/BerkeleyMono-Regular.woff2') format('woff2'),
-    url('/fonts/BerkeleyMono-Regular.woff') format('woff');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
+  @font-face {
+    font-family: "Atkinson Hyperlegible";
+    src: url("/fonts/Atkinson-Hyperlegible-Bold-102a.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
 
-@font-face {
-  font-family: 'Berkeley Mono';
-  src:
-    url('/fonts/BerkeleyMono-Italic.woff2') format('woff2'),
-    url('/fonts/BerkeleyMono-Italic.woff') format('woff');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
+  @font-face {
+    font-family: "Atkinson Hyperlegible";
+    src: url("/fonts/Atkinson-Hyperlegible-BoldItalic-102a.woff2")
+      format("woff2");
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+  }
 
-@font-face {
-  font-family: 'Berkeley Mono';
-  src:
-    url('/fonts/BerkeleyMono-Bold.woff2') format('woff2'),
-    url('/fonts/BerkeleyMono-Bold.woff') format('woff');
-  font-weight: 700;
-  font-style: bold;
-  font-display: swap;
-}
+  @font-face {
+    font-family: "Berkeley Mono";
+    src:
+      url("/fonts/BerkeleyMono-Regular.woff2") format("woff2"),
+      url("/fonts/BerkeleyMono-Regular.woff") format("woff");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
 
-@font-face {
-  font-family: 'Berkeley Mono';
-  src:
-    url('/fonts/BerkeleyMono-BoldItalic.woff2') format('woff2'),
-    url('/fonts/BerkeleyMono-BoldItalic.woff') format('woff');
-  font-weight: 700;
-  font-style: italic;
-  font-display: swap;
-}
+  @font-face {
+    font-family: "Berkeley Mono";
+    src:
+      url("/fonts/BerkeleyMono-Italic.woff2") format("woff2"),
+      url("/fonts/BerkeleyMono-Italic.woff") format("woff");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+  @font-face {
+    font-family: "Berkeley Mono";
+    src:
+      url("/fonts/BerkeleyMono-Bold.woff2") format("woff2"),
+      url("/fonts/BerkeleyMono-Bold.woff") format("woff");
+    font-weight: 700;
+    font-style: bold;
+    font-display: swap;
+  }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  @font-face {
+    font-family: "Berkeley Mono";
+    src:
+      url("/fonts/BerkeleyMono-BoldItalic.woff2") format("woff2"),
+      url("/fonts/BerkeleyMono-BoldItalic.woff") format("woff");
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+  }
 }
 
 ::selection {

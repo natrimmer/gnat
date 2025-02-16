@@ -4,6 +4,7 @@
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/container-queries';
 @plugin '@tailwindcss/aspect-ratio';
+@plugin 'tailwind-scrollbar';
 
 @theme {
   --font-sans: Atkinson Hyperlegible, system-ui, sans-serif;

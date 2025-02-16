@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Config
-REPO_PATH="."
+REPO_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BRANCH="prod"
 LOG_FILE="sync_bluesky.log"
 

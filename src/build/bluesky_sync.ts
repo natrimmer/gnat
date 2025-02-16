@@ -142,7 +142,7 @@ async function main() {
       lastChecked,
       logger,
     );
-    for (const post of posts) {
+    for (const post of [...posts].reverse()) {
       await createPost(post, logger);
     }
 

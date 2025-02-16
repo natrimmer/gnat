@@ -3,7 +3,13 @@
 # Config
 REPO_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BRANCH="prod"
-LOG_FILE="sync_bluesky.log"
+LOG_FILE="$REPO_PATH/logs/sync_bluesky.log"
+
+# Create logs directory if it doesn't exist
+mkdir -p "$REPO_PATH/logs"
+
+# Redirect all output to log file AND console
+exec 1> >(tee -a "$LOG_FILE") 2>&1
 
 # Function to load .env file
 load_env() {

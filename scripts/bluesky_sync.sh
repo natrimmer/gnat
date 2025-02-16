@@ -17,20 +17,35 @@ load_env() {
 
 # Function to send Matrix notification
 send_matrix_message() {
-   local msg_text="$1"
-   local msg_type="$2"  # "error" or "success"
+    local msg_text="$1"
+    local msg_type="$2"
 
-   if [ "$msg_type" = "error" ]; then
-       msg_text="❌ Bluesky Sync Error: $msg_text"
-   else
-       msg_text="✅ Bluesky Sync: $msg_text"
-   fi
+    # Debug output
+    echo "Debug: Checking Matrix credentials..."
+    echo "Debug: MATRIX_HOMESERVER=${MATRIX_HOMESERVER:-not set}"
+    echo "Debug: MATRIX_ROOM_ID=${MATRIX_ROOM_ID:-not set}"
+    echo "Debug: MATRIX_ACCESS_TOKEN=${MATRIX_ACCESS_TOKEN:0:5}... (truncated)"
 
-   curl -XPOST \
-       -d "{\"msgtype\":\"m.text\", \"body\":\"$msg_text\"}" \
-       -H "Content-Type: application/json" \
-       -H "Authorization: Bearer ${MATRIX_ACCESS_TOKEN}" \
-       "${MATRIX_HOMESERVER}/_matrix/client/r0/rooms/${MATRIX_ROOM_ID}/send/m.room.message"
+    # Verify credentials exist
+    if [ -z "$MATRIX_ACCESS_TOKEN" ] || [ -z "$MATRIX_ROOM_ID" ] || [ -z "$MATRIX_HOMESERVER" ]; then
+        echo "Error: Matrix credentials not properly configured in .env"
+        return 1
+    fi
+
+    if [ "$msg_type" = "error" ]; then
+        msg_text="❌ Bluesky Sync Error: $msg_text"
+    else
+        msg_text="✅ Bluesky Sync: $msg_text"
+    fi
+
+    # Debug the curl command (without exposing the full token)
+    echo "Debug: Sending Matrix message to room ${MATRIX_ROOM_ID}"
+
+    curl -v -XPOST \
+        -d "{\"msgtype\":\"m.text\", \"body\":\"$msg_text\"}" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${MATRIX_ACCESS_TOKEN}" \
+        "${MATRIX_HOMESERVER}/_matrix/client/r0/rooms/${MATRIX_ROOM_ID}/send/m.room.message"
 }
 
 # Function to log with timestamp

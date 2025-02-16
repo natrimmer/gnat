@@ -1,13 +1,14 @@
-import { AppBskyFeedDefs, AtpAgent } from '@atproto/api';
-import fs from 'fs';
-import path from 'path';
-import { initLogger } from '../utils/logger';
+import { AppBskyFeedDefs, AtpAgent } from "@atproto/api";
+import fs from "fs";
+import path from "path";
+import { initLogger } from "../utils/logger";
+import { ServiceTimestamps } from "../utils/types";
 
-const POSTS_DIR = 'src/content/feed';
-const TEMPLATE_PATH = 'src/components/feed-template.html';
+const POSTS_DIR = "src/content/feed";
+const TEMPLATE_PATH = "src/components/feed-template.html";
 
 interface ImageEmbed {
-  $type: 'app.bsky.embed.images#view';
+  $type: "app.bsky.embed.images#view";
   images: {
     fullsize: string;
     alt: string;
@@ -16,7 +17,7 @@ interface ImageEmbed {
 }
 
 interface ExternalEmbed {
-  $type: 'app.bsky.embed.external#view';
+  $type: "app.bsky.embed.external#view";
   external: {
     uri: string;
     title: string;
@@ -25,7 +26,7 @@ interface ExternalEmbed {
 }
 
 interface RecordEmbed {
-  $type: 'app.bsky.embed.record#view';
+  $type: "app.bsky.embed.record#view";
   record: {
     text: string;
   };
@@ -41,18 +42,37 @@ interface Post extends AppBskyFeedDefs.PostView {
   };
 }
 
-const LAST_SYNC_FILE = 'src/build/last_sync.log';
+const TIMESTAMPS_FILE = "service_timestamps.json";
 
 function getLastCheckedTime(): string {
   try {
-    return fs.readFileSync(LAST_SYNC_FILE, 'utf-8').trim();
+    const timestamps = JSON.parse(
+      fs.readFileSync(TIMESTAMPS_FILE, "utf-8"),
+    ) as ServiceTimestamps;
+    return timestamps.bluesky_last_sync || new Date(0).toISOString();
   } catch {
     return new Date(0).toISOString();
   }
 }
 
 function saveLastCheckedTime(time: string): void {
-  fs.writeFileSync(LAST_SYNC_FILE, time);
+  try {
+    let timestamps: ServiceTimestamps;
+    try {
+      timestamps = JSON.parse(fs.readFileSync(TIMESTAMPS_FILE, "utf-8"));
+    } catch {
+      timestamps = {
+        bluesky_last_sync: "",
+        hevy_last_sync: "",
+        prod_last_build: "",
+      };
+    }
+
+    timestamps.bluesky_last_sync = time;
+    fs.writeFileSync(TIMESTAMPS_FILE, JSON.stringify(timestamps, null, 2));
+  } catch (error) {
+    console.error("Failed to save timestamp:", error);
+  }
 }
 
 async function getNewPosts(
@@ -69,18 +89,18 @@ async function getNewPosts(
       actor: did,
       limit: 50,
       cursor,
-      filter: 'posts_no_replies',
+      filter: "posts_no_replies",
     });
     for (const item of response.data.feed) {
       const postDate = new Date(item.post.indexedAt);
-      if (lastChecked === '') {
+      if (lastChecked === "") {
         newPosts.push(item.post as Post);
         logger.info(`New post found: ${item.post.uri}`);
       } else if (postDate > new Date(lastChecked)) {
         newPosts.push(item.post as Post);
         logger.info(`New post found: ${item.post.uri}`);
       } else {
-        logger.info('No more new posts found.');
+        logger.info("No more new posts found.");
         return newPosts;
       }
     }
@@ -93,7 +113,7 @@ async function getNewPosts(
 
 async function main() {
   const agent = new AtpAgent({
-    service: 'https://bsky.social',
+    service: "https://bsky.social",
   });
   const logger = initLogger();
 
@@ -102,11 +122,11 @@ async function main() {
       identifier: process.env.BLUESKY_IDENTIFIER!,
       password: process.env.BLUESKY_PASSWORD!,
     });
-    logger.info('Logged in to Bluesky');
+    logger.info("Logged in to Bluesky");
 
     const lastChecked = getLastCheckedTime();
     if (!lastChecked) {
-      logger.info('No last sync time found, fetching all posts.');
+      logger.info("No last sync time found, fetching all posts.");
     } else {
       logger.info(`Last sync time: ${lastChecked}`);
     }
@@ -128,32 +148,32 @@ async function main() {
 
     saveLastCheckedTime(new Date().toISOString());
   } catch (error) {
-    console.error('Error during synchronization:', error);
+    console.error("Error during synchronization:", error);
   }
 }
 
 function processEmbed(embed: PostEmbed | undefined): string {
-  if (!embed) return '';
+  if (!embed) return "";
 
   switch (embed.$type) {
-    case 'app.bsky.embed.images#view':
+    case "app.bsky.embed.images#view":
       return embed.images
         .map(
           (img) =>
             `<img src="${escapeHtml(img.fullsize)}" alt="${escapeHtml(img.alt)}" />`,
         )
-        .join('\n');
+        .join("\n");
 
-    case 'app.bsky.embed.external#view':
+    case "app.bsky.embed.external#view":
       return `<a href="${escapeHtml(embed.external.uri)}" target="_blank">
         ${escapeHtml(embed.external.title)}
       </a>`;
 
-    case 'app.bsky.embed.record#view':
+    case "app.bsky.embed.record#view":
       return `<blockquote>Quoted post: ${escapeHtml(embed.record.text)}</blockquote>`;
 
     default:
-      return '';
+      return "";
   }
 }
 
@@ -161,27 +181,27 @@ async function createPost(
   post: Post,
   logger: ReturnType<typeof initLogger>,
 ): Promise<void> {
-  const template = fs.readFileSync(TEMPLATE_PATH, 'utf-8');
+  const template = fs.readFileSync(TEMPLATE_PATH, "utf-8");
   const postNumber = getNextPostNumber();
-  const fileName = `${postNumber.toString().padStart(4, '0')}.html`;
+  const fileName = `${postNumber.toString().padStart(4, "0")}.html`;
   logger.info(`Creating post file: ${fileName}`);
 
   const content = [
-    `<p>${escapeHtml(post.record.text || '')}</p>`,
+    `<p>${escapeHtml(post.record.text || "")}</p>`,
     processEmbed(post.embed),
   ]
     .filter(Boolean)
-    .join('\n');
+    .join("\n");
   logger.info(`Post content: ${content}`);
 
   const rendered = template
-    .replace('{title}', `/feed/${fileName.replace('.html', '')}/`)
-    .replace('{date}', new Date(post.indexedAt).toISOString().split('T')[0])
+    .replace("{title}", `/feed/${fileName.replace(".html", "")}/`)
+    .replace("{date}", new Date(post.indexedAt).toISOString().split("T")[0])
     .replace(
-      '{link}',
-      `https://bsky.app/profile/${process.env.BLUESKY_IDENTIFIER}/post/${post.uri.split('/').pop()}`,
+      "{link}",
+      `https://bsky.app/profile/${process.env.BLUESKY_IDENTIFIER}/post/${post.uri.split("/").pop()}`,
     )
-    .replace('{content}', content);
+    .replace("{content}", content);
 
   fs.writeFileSync(path.join(POSTS_DIR, fileName), rendered);
   logger.info(`Post file created: ${fileName}`);
@@ -190,18 +210,18 @@ async function createPost(
 function getNextPostNumber(): number {
   const files = fs.readdirSync(POSTS_DIR);
   const numbers = files
-    .filter((f) => f.endsWith('.html') && !f.startsWith('draft_'))
+    .filter((f) => f.endsWith(".html") && !f.startsWith("draft_"))
     .map((f) => parseInt(f.slice(0, 4), 10));
   return numbers.length ? Math.max(...numbers) + 1 : 1;
 }
 
 function escapeHtml(text: string): string {
   return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 main().catch(console.error);

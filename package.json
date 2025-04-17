@@ -1,6 +1,6 @@
 {
   "name": "gnat",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "scripts": {
     "sync:dev": "ts-node -r dotenv/config src/build/bluesky_sync.ts",

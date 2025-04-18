@@ -81,15 +81,15 @@ log "Completed Bluesky sync process"
 # Update timestamp
 update_timestamp
 
-# Check if there are changes to commit
-# if [[ -n $(git status -s) ]]; then
-#    git add .
-#    commit_msg="Auto-sync Bluesky posts [$(date +'%Y-%m-%d %H:%M:%S')]"
-#    git commit -m "$commit_msg"
-#    git push -f origin $BRANCH
-#    log "Changes committed and pushed: $commit_msg"
-# else
-#    log "No changes to commit"
-# fi
+Check if there are changes to commit
+if [[ -n $(git status -s) ]]; then
+   git add .
+   commit_msg="Auto-sync Bluesky posts [$(date +'%Y-%m-%d %H:%M:%S')]"
+   git commit -m "$commit_msg"
+   git push -f origin $BRANCH
+   log "Changes committed and pushed: $commit_msg"
+else
+   log "No changes to commit"
+fi
 
 send_matrix_message "Sync completed successfully" "success"

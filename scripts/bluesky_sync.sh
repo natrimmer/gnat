@@ -81,7 +81,7 @@ log "Completed Bluesky sync process"
 # Update timestamp
 update_timestamp
 
-Check if there are changes to commit
+# Check if there are changes to commit
 if [[ -n $(git status -s) ]]; then
    git add .
    commit_msg="Auto-sync Bluesky posts [$(date +'%Y-%m-%d %H:%M:%S')]"

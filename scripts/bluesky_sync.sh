@@ -75,7 +75,7 @@ npx tsc
 log "Built TypeScript files"
 
 # Run the sync (environment variables are already loaded from .env)
-node dist/build/bluesky_sync.js
+node dist/services/bluesky/BlueskySync.js
 log "Completed Bluesky sync process"
 
 # Update timestamp

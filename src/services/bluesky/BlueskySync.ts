@@ -7,7 +7,7 @@ import { Post, PostEmbed } from "./types";
 
 const POSTS_DIR = "src/content/feed";
 const TEMPLATE_PATH = "src/components/feed-template.html";
-const TIMESTAMPS_FILE = "service_timestamps.json";
+const TIMESTAMPS_FILE = "src/data/service_timestamps.json";
 
 function getLastCheckedTime(): string {
   const logger = initLogger();

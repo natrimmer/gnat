@@ -1,97 +1,40 @@
 <!-- extends: base -->
 <!-- title: init -->
 <!-- date: 2025-01-10  -->
-<!-- updated: 2025-01-16 -->
+<!-- updated: 2025-04-19 -->
 
 <div>
-  <pre class="text-xs">
-    ┌──────────────┐        ┌──────────────┐         ┌─────────────┐
-    │ Source Files │───┐    │              │░   ┌───▶│ Assets Copy │░
-    └──────────────┘░  └───▶│ File Scanner │────┘    └─────────────┘░
-     ░░░░░░░░░░░░░░░░       │              │░  .other ░░░░░░░░░░░░░░░
-                            └──────────────┘░
-    ┌──────────────┐         ░░░░░░░│░░░░░░░░       ┌──────────────┐
-    │  Components  │──┐             │               │ File Watcher │░
-    └──────────────┘░ │             │ .html         └──────────────┘░
-     ░░░░░░░░░░░░░░░░ │             │                ░░░░░░░│░░░░░░░░
-                      │             │                       │
-                      │             │                       ▼
-    ┌─────────────────┼─────────────▼──────────────────────────────┐
-    │Build Pipeline   │   ┌───────────────────┐                    │░
-    │                 └──▶│ Content Processor │░                   │░
-    │                     └───────────────────┘░                   │░
-    │                      ░░░░░░░░░│░░░░░░░░░░░                   │░
-    │                               ▼                              │░
-    │                     ┌───────────────────┐                    │░
-    │                     │ Extract Metadata  │░                   │░
-    │                     └───────────────────┘░                   │░
-    │                      ░░░░░░░░░│░░░░░░░░░░░                   │░
-    │                               ▼                              │░
-    │                     ┌───────────────────┐                    │░
-    │                     │  Apply Template   │░                   │░
-    │                     └───────────────────┘░                   │░
-    │                      ░░░░░░░░░│░░░░░░░░░░░                   │░
-    │                               ▼                              │░
-    │                     ┌───────────────────┐                    │░
-    │                     │  Process Nested   │░                   │░
-    │                     │    Components     │░                   │░
-    │                     └───────────────────┘░                   │░
-    │                      ░░░░░░░░░│░░░░░░░░░░░                   │░
-    │                               ▼                              │░
-    │                     ┌───────────────────┐                    │░
-    │                     │  Generate Pages   │░                   │░
-    │                     └───────────────────┘░                   │░
-    │                      ░░░░░░░░░░░░░░░░░░░░░                   │░
-    └──────────────────────────────────────────────────────────────┘░
-     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-                                    ▼
-    ┌──────────────────────────────────────────────────────────────┐
-    │                         Static Site                          │░
-    └──────────────────────────────────────────────────────────────┘░
-     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-                                    ▼
-    ┌──────────────────────────────────────────────────────────────┐
-    │                         Live Server                          │░
-    └──────────────────────────────────────────────────────────────┘░
-     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-  </pre>
-  <p>
-    It has been fun and exciting developing this new site and build system. I've
-    tried and dabbled with countless static site generators, but none of them
-    have been quite right. I wanted something that had the development
-    convenience and extensibility of a modern framework yet produced something
-    performant, simple, js free, and easy to maintain.
+  <h3 class="text-lg font-bold text-mondrian_black my-4">
+    Building a Zero-JavaScript Static Site Generator
+  </h3>
+  <p class="mb-2">
+    This site runs on a custom TypeScript static site generator that produces
+    pure HTML with no JavaScript. It loads instantly, works everywhere, and
+    stays maintainable. Most modern sites load megabytes of JavaScript before
+    showing basic content - I wanted something lightweight that starts with
+    essentials and adds complexity only when needed. Content lives in HTML files
+    with metadata in comments, processed through a pipeline: scanning files,
+    extracting metadata, applying templates, and generating static pages. The
+    system uses parallel type-specific handlers with a factory pattern creating
+    appropriate handlers for each content type. Reusable HTML components support
+    nesting for consistent design. During development, a file watcher rebuilds
+    pages instantly when content changes, providing immediate feedback similar
+    to JavaScript frameworks but with static output. Tailwind CSS eliminates
+    context switching between files, making the codebase more maintainable with
+    explicit, localized styling. The site automatically syncs with Bluesky,
+    pulling posts into the feed section and blending crafted content with social
+    updates. The result is a fast, lightweight site that loads instantly, works
+    without JavaScript, and delivers a rich experience through thoughtful HTML
+    and CSS.
   </p>
-  <div class="bg-gray-100 p-2 mt-4">
-    <h4 class="text-2xl font-sans font-semibold">How It Works</h4>
-  </div>
   <p>
-    The build system operates on a component-based architecture with a few key
-    principles:
-  </p>
-  <dl class="font-mono text-sm space-y-2 mt-4">
-    <dt class="font-semibold">Content Files:</dt>
-    <dd>
-      HTML files with metadata in comments. Each file represents a page or
-      entry.
-    </dd>
-    <dt class="font-semibold">Components:</dt>
-    <dd>
-      Reusable HTML snippets (templates, rows, footers) that get injected during
-      build.
-    </dd>
-    <dt class="font-semibold">Build Process:</dt>
-    <dd>
-      Scans content directories, processes files based on type (articles, notes,
-      feed), generates paginated indexes.
-    </dd>
-    <dt class="font-semibold">Development Mode:</dt>
-    <dd>Live server + file watcher for instant rebuilds during development.</dd>
-  </dl>
-  <p class="mt-4">
-    All content processing happens at build time. The result is a purely static
-    site with no client-side JavaScript, yet it maintains dynamic features
-    through automated rebuilds on git pushes. Navigation uses standard HTML
-    pagination, and components allow for consistent styling across pages.
+    I'm interested in dynamic static generation, providing a very fast user
+    experience where all work happens at build time. This ensures the site is
+    always ready to serve users with pre-rendered content that benefits SEO and
+    accessibility. It enables better caching and performance optimization
+    through CDN or edge cache distribution. This approach reduces server load
+    since content generates once rather than for each request. I'd like to
+    explore applying this to other projects, particularly those needing frequent
+    updates or dynamic content.
   </p>
 </div>

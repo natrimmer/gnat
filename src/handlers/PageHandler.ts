@@ -28,8 +28,13 @@ export class PageHandler extends BaseContentHandler {
       const files = await this.getAllContentFiles(contentDir);
       this.logger.info(`Found ${files.length} HTML files to process`);
 
+      // Separate sitemap file from other files
+      const sitemapFile = files.find(file => path.basename(file) === "sitemap.html");
+      const regularFiles = files.filter(file => path.basename(file) !== "sitemap.html");
+
+      // Process regular files first in parallel
       await Promise.all(
-        files.map(async (file) => {
+        regularFiles.map(async (file) => {
           const basename = path.basename(file);
 
           if (this.SKIP_FILES.includes(basename)) {
@@ -43,6 +48,12 @@ export class PageHandler extends BaseContentHandler {
           await this.processPage(file);
         }),
       );
+
+      // Then process sitemap file last if it exists
+      if (sitemapFile) {
+        this.logger.debug("Processing sitemap as the final step", { file: sitemapFile });
+        await this.processPage(sitemapFile);
+      }
 
       this.logger.info("Completed page processing");
     } catch (error) {

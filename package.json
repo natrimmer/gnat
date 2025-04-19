@@ -1,13 +1,13 @@
 {
   "name": "gnat",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "scripts": {
     "sync:dev": "ts-node -r dotenv/config src/build/bluesky_sync.ts",
     "tailwind:dev": "npx @tailwindcss/cli -i ./src/input.css -o ./public/styles.css --watch",
     "tailwind:build": "npx @tailwindcss/cli -i ./src/input.css -o ./public/styles.css",
-    "server:dev": "ts-node src/index.ts --watch",
-    "server:build": "ts-node src/index.ts",
+    "server:dev": "ts-node -r dotenv/config src/index.ts --watch",
+    "server:build": "ts-node -r dotenv/config src/index.ts",
     "dev": "concurrently --kill-others-on-fail --prefix \"[{name}]\" --names \"SERVER,TAILWIND\" \"npm run server:dev\" \"npm run tailwind:dev\"",
     "build": "npm run tailwind:build && npm run server:build"
   },

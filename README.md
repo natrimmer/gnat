@@ -2,7 +2,7 @@
 
 ## About
 
-This repository contains the source code for the custom SSG that builds my site. It also contains the source content and components.
+TypeScript static site generator with component architecture. Produces zero JavaScript output. Parallel processing of different content types. Components support nested inclusion.
 
 ## Deployment
 

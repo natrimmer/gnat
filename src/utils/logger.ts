@@ -1,9 +1,11 @@
 import winston = require("winston");
-import fs from "fs";
-import path from "path";
+import * as fs from "fs";
+import * as path from "path";
 
 let loggerInstance: winston.Logger | null = null;
+const { format } = winston;
 
+// Setup directory for file logging
 const setupFileLogging = () => {
   const logsDir = path.join(process.cwd(), "logs");
   if (!fs.existsSync(logsDir)) {
@@ -11,39 +13,79 @@ const setupFileLogging = () => {
   }
 };
 
+// Define a type for winston info object with our custom properties
+interface LogInfo extends winston.Logform.TransformableInfo {
+  prettyMeta?: string;
+}
+
+// Custom formatter for pretty printing metadata
+const createPrettyMetadata = () => format((info: LogInfo) => {
+  const { level, message, timestamp, splat, ...metadata } = info;
+  
+  if (Object.keys(metadata).length > 0) {
+    info.prettyMeta = JSON.stringify(metadata, null, 2);
+  } else {
+    info.prettyMeta = '';
+  }
+  
+  return info;
+})();
+
+// Base formatter that formats log messages with indented metadata
+const createBaseFormatter = () => format.printf((info: LogInfo) => {
+  const { timestamp, level, message, prettyMeta } = info;
+  let msg = `${timestamp} ${level}: ${message}`;
+  
+  if (prettyMeta) {
+    msg += `\n${prettyMeta
+      .split('\n')
+      .map(line => `  ${line}`) // Indent each line
+      .join('\n')
+    }`;
+  }
+  
+  return msg;
+});
+
+// Create a console format with colors
+const createConsoleFormat = () => format.combine(
+  format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+  createPrettyMetadata(),
+  format.colorize(),
+  createBaseFormatter()
+);
+
+// Create a file format without colors
+const createFileFormat = () => format.combine(
+  format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+  createPrettyMetadata(),
+  createBaseFormatter()
+);
+
+// Main logger creation function
 const createLogger = (useFileTransport: boolean = false): winston.Logger => {
-  const { format } = winston;
-
   const baseConfig: winston.LoggerOptions = {
-    level: "debug",
-    format: format.combine(
-      format.timestamp({
-        format: "YYYY-MM-DD HH:mm:ss",
-      }),
-      format.colorize(),
-      format.printf(({ timestamp, level, message, ...metadata }) => {
-        let msg = `${timestamp} ${level}: ${message}`;
-
-        // Add metadata if present
-        if (Object.keys(metadata).length > 0) {
-          msg += ` ${JSON.stringify(metadata)}`;
-        }
-
-        return msg;
-      }),
-    ),
-    transports: [new winston.transports.Console()],
+    level: process.env.LOG_LEVEL || "info",
+    transports: [
+      new winston.transports.Console({
+        format: createConsoleFormat()
+      })
+    ],
   };
 
   if (useFileTransport) {
     setupFileLogging();
+    const fileFormat = createFileFormat();
+    
     (baseConfig.transports as winston.transport[]).push(
       new winston.transports.File({
         filename: "logs/error.log",
         level: "error",
+        format: fileFormat
       }),
       new winston.transports.File({
         filename: "logs/combined.log",
+        format: fileFormat
       }),
     );
   }
@@ -68,6 +110,7 @@ export const initLogger = (
   loggerInstance.info("Logger initialized", {
     useFileTransport,
     level: loggerInstance.level,
+    source: process.env.LOG_LEVEL ? "environment" : "default",
     transports: loggerInstance.transports.map((t) => t.constructor.name),
   });
 
@@ -88,7 +131,8 @@ export const getLogger = (): winston.Logger => {
 // Export a function to change log level dynamically
 export const setLogLevel = (level: string): void => {
   const logger = getLogger();
-  logger.debug("Changing log level", { from: logger.level, to: level });
+  const source = process.env.LOG_LEVEL ? "environment" : "default";
+  logger.debug("Changing log level", { from: logger.level, source, to: level });
   logger.level = level;
 };
 
@@ -103,17 +147,21 @@ export const addFileTransport = (): void => {
 
   logger.debug("Adding file transport");
   setupFileLogging();
+  
+  const fileFormat = createFileFormat();
 
   logger.add(
     new winston.transports.File({
       filename: "logs/error.log",
       level: "error",
+      format: fileFormat
     }),
   );
 
   logger.add(
     new winston.transports.File({
       filename: "logs/combined.log",
+      format: fileFormat
     }),
   );
 

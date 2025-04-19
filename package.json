@@ -14,7 +14,7 @@
   "dependencies": {
     "@atproto/api": "^0.13.31",
     "@types/node": "^22.14.1",
-    "typescript": "^5.7.2",
+    "typescript": "^5.8.3",
     "winston": "^3.17.0"
   },
   "devDependencies": {

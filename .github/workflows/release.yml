@@ -14,7 +14,7 @@ jobs:
       version: ${{ steps.package-version.outputs.version }}
       tag_exists: ${{ steps.tag-check.outputs.exists }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -40,7 +40,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 

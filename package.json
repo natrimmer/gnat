@@ -12,7 +12,7 @@
     "build": "npm run tailwind:build && npm run server:build"
   },
   "dependencies": {
-    "@atproto/api": "^0.13.31",
+    "@atproto/api": "^0.15.3",
     "@types/node": "^22.14.1",
     "typescript": "^5.7.2",
     "winston": "^3.17.0"

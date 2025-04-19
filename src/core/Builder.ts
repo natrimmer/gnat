@@ -30,11 +30,12 @@ export class Builder {
         this.logger.debug("Output directory cleaned");
       }
 
-      // Process all content types and regular pages
-      const contentTypes = ["articles", "feed", "notes", "changelog", "pages"];
-      this.logger.info(`Processing content types: ${contentTypes.join(", ")}`);
-
+      // Process content types first, then pages (which includes sitemap)
+      const contentTypes = ["articles", "feed", "notes", "changelog"];
       const startTime = Date.now();
+      
+      // First, process all content types in parallel
+      this.logger.info(`Processing content types: ${contentTypes.join(", ")}`);
       await Promise.all(
         contentTypes.map(async (type) => {
           this.logger.debug(`Initializing handler for ${type}`);
@@ -53,6 +54,21 @@ export class Builder {
           }
         }),
       );
+      
+      // Then process pages (including sitemap) last
+      this.logger.info("Processing pages and sitemap");
+      const pageHandler = ContentHandlerFactory.getHandler("pages");
+      const pageStartTime = Date.now();
+      try {
+        await pageHandler.process();
+        const processingTime = Date.now() - pageStartTime;
+        this.logger.debug(
+          `Completed processing pages in ${processingTime}ms`,
+        );
+      } catch (error) {
+        this.logger.warn(`Error processing pages: ${error}`);
+        throw error;
+      }
 
       const totalTime = Date.now() - startTime;
       this.logger.info(`Build completed successfully in ${totalTime}ms`);
